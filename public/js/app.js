@@ -39,7 +39,7 @@ $(function () {
 $(function () {
 	//check password length (reg and login pages)
 	var passw = $('#password');
-	var notify = $('<small style="color:red;">');
+	var notify = $('<small style="color:red; display:block;">');
 	passw.on('input', function (e) {
 		if (passw.val().length > 7) {
 			notify.text('');

@@ -6,10 +6,10 @@
   <article>
     <div class="card-header">
       <strong class="font-weight-bolder">{{.payload.Title}}</strong>
-      <span class="text-muted font-italic">
-        &middot; by <strong>{{.payload.Author.Username}}</strong> on
+      <small class="text-muted">
+        &middot; <em>by</em> <strong>{{.payload.Author.Username}}</strong> on
         {{.payload.CreatedAt.Format "Mon Jan 2 15:04 2006"}}
-      </span>
+      </small>
     </div>
 
     <div class="card-body bg-white">
@@ -137,9 +137,9 @@
   {{ range $i, $v := .payload.Comments}}
     <div class="ml-2 p-2">
         <strong>{{.Author.Username}}</strong> &middot;
-        <em class="text-muted">{{.CreatedAt.Format "Mon Jan 2 15:04 2006"}}</em>
+        <small class="text-muted">{{.CreatedAt.Format "Mon Jan 2 15:04 2006"}}</small>
     </div>
-    <div class="ml-4">
+    <div class="ml-4 mb-2">
       {{html .Content}}
     </div>
     {{ if not (eq $i (decr $total_comments)) }} <hr class="m-0 p-0"> {{ end }}
