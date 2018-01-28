@@ -36,11 +36,12 @@ func (h *Handler) ArticleDetail(c *gin.Context) {
 	articleID := c.Param("article_id")
 	article := h.as.GetByID(articleID)
 	status := 200
-	template := "article.html"
+	templateName := "article.html"
 	var title string
 	if article == nil {
+		title = "Content not found"
 		status = http.StatusNotFound
-		template = "404.html"
+		templateName = "404.html"
 	} else {
 		title = article.Title
 		article.Comments = h.cs.GetByArticle(article)
@@ -48,7 +49,7 @@ func (h *Handler) ArticleDetail(c *gin.Context) {
 	h.render(status, c, gin.H{
 		"title":   title,
 		"payload": article,
-	}, template)
+	}, templateName)
 }
 
 func (h *Handler) CreateArticle(c *gin.Context) {

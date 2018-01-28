@@ -32,7 +32,7 @@ func Bind(c *gin.Context, obj interface{}) error {
 	return c.ShouldBindWith(obj, b)
 }
 
-//retrieve user from
+//retrieve user from c
 func getUserFromContext(c *gin.Context) *models.User {
 	u, exists := c.Get("user")
 	if !exists {

@@ -7,7 +7,6 @@ import (
 	"github.com/fibreactive/articlelate/templates"
 
 	"github.com/fibreactive/articlelate/handler"
-	"github.com/fibreactive/articlelate/service"
 	"github.com/gin-gonic/gin"
 
 	"github.com/Kamva/mgm/v3"
@@ -30,10 +29,7 @@ func main() {
 	r := gin.Default()
 	r.Static("/public", "./public")
 	r.HTMLRender = templates.LoadTemplates("./templates")
-	us := service.NewUserStore()
-	as := service.NewArticleStore()
-	cs := service.NewCommentStore()
-	h := handler.NewHandler(us, as, cs)
+	h := handler.NewHandler()
 	Routes(r, h)
 	//gin.SetMode(gin.ReleaseMode)
 	r.Run()

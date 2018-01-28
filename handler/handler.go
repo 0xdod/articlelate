@@ -13,7 +13,10 @@ type Handler struct {
 	cs service.CommentService
 }
 
-func NewHandler(us service.UserService, as service.ArticleService, cs service.CommentService) *Handler {
+func NewHandler() *Handler {
+	us := service.NewUserStore()
+	as := service.NewArticleStore()
+	cs := service.NewCommentStore()
 	return &Handler{
 		us: us,
 		as: as,

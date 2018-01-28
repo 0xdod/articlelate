@@ -13,7 +13,7 @@
     </div>
 
     <div class="card-body bg-white">
-      <p class="card-text">{{ .payload.Content }}</p>
+      <p class="card-text">{{ .payload.Content|linebreaks }}</p>
     </div>
   </article>
 
@@ -140,7 +140,7 @@
         <small class="text-muted">{{.CreatedAt.Format "Mon Jan 2 15:04 2006"}}</small>
     </div>
     <div class="ml-4 mb-2">
-      {{html .Content}}
+      {{ .Content|linebreaks}}
     </div>
     {{ if not (eq $i (decr $total_comments)) }} <hr class="m-0 p-0"> {{ end }}
   {{end}}

@@ -24,11 +24,14 @@ $(function () {
 			action: currentAction,
 		};
 		$.post(
-			'/article/' + $this.data('id') +'/like',
+			'/article/' + $this.data('id') + '/like',
 			JSON.stringify(update),
 			function (data) {
 				like.text(data.likes);
-				$this.find('i').toggleClass("fa-thumbs-up").toggleClass("fa-thumbs-down");
+				$this
+					.find('i')
+					.toggleClass('fa-thumbs-up')
+					.toggleClass('fa-thumbs-down');
 				likeBtn.toggleClass('btn-secondary').toggleClass('btn-success');
 			}
 		);
