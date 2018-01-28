@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/fibreactive/articlelate/models"
@@ -8,13 +9,10 @@ import (
 )
 
 func (h *Handler) Register(c *gin.Context) {
-	getFunc := func() {
-		h.render(http.StatusOK, c, nil, "register.html")
-	}
-	postFunc := func() {
+	if c.Request.Method == "POST" {
 		var req SignUpForm
 		if err := Bind(c, &req); err != nil {
-			c.AbortWithStatus(http.StatusBadRequest)
+			c.AbortWithStatus(422)
 			return
 		}
 		user := models.NewUser(req.Username, req.Email, req.Password)
@@ -22,44 +20,42 @@ func (h *Handler) Register(c *gin.Context) {
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		token, err := h.us.GenerateAuthToken(user)
-		if err != nil {
-			c.AbortWithStatus(http.StatusUnauthorized)
-			return
-		}
-		c.SetCookie("auth", token, 0, "/", "", false, true)
 		c.Redirect(http.StatusSeeOther, "/u/login")
-
+		return
 	}
-	resolveGetOrPost(c, getFunc, postFunc)
+	user := getUserFromContext(c)
+	if user != nil {
+		c.Redirect(http.StatusSeeOther, "/")
+		return
+	}
+	h.render(http.StatusOK, c, nil, "register.html")
 }
 
 func (h *Handler) Login(c *gin.Context) {
-	getFunc := func() {
-		h.render(http.StatusOK, c, nil, "login.html")
-	}
-	postFunc := func() {
+	var Err error
+	if c.Request.Method == "POST" {
 		var req LoginForm
 		if err := Bind(c, &req); err != nil {
-			c.SetCookie("message", "Login details incorrect try again", 1, "/", "", false, false)
-			c.Redirect(http.StatusSeeOther, "/u/login")
-			return
+			Err = errors.New("Login details incorrect try again")
 		}
 		user := h.us.Authenticate(req.Login, req.Password)
 		if user == nil {
-			c.SetCookie("message", "Login details incorrect try again", 1, "/", "", false, false)
-			c.Redirect(http.StatusSeeOther, "/u/login")
-			return
+			Err = errors.New("Login details incorrect try again")
+		} else {
+			token, err := h.us.GenerateAuthToken(user)
+			if err == nil {
+				c.SetCookie("auth", token, 360000, "/", "", false, true)
+				c.Redirect(http.StatusSeeOther, "/")
+				return
+			}
 		}
-		token, err := h.us.GenerateAuthToken(user)
-		if err != nil {
-			c.AbortWithStatus(http.StatusInternalServerError)
-			return
-		}
-		c.SetCookie("auth", token, 0, "/", "", false, true)
-		c.Redirect(http.StatusSeeOther, "/")
 	}
-	resolveGetOrPost(c, getFunc, postFunc)
+	user := getUserFromContext(c)
+	if user != nil {
+		c.Redirect(http.StatusSeeOther, "/")
+		return
+	}
+	h.render(http.StatusOK, c, gin.H{"error": Err}, "login.html")
 }
 
 func (h *Handler) Logout(c *gin.Context) {

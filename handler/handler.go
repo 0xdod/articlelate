@@ -23,7 +23,7 @@ func NewHandler(us service.UserService, as service.ArticleService, cs service.Co
 
 func (h *Handler) NotFound(c *gin.Context) {
 	h.render(http.StatusNotFound, c, gin.H{
-		"title":   "Oops, Content not found",
+		"title":   "Content not found",
 		"payload": "",
 	}, "404.html")
 }

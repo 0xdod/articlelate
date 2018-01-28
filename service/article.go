@@ -4,6 +4,7 @@ import (
 	"github.com/Kamva/mgm/v3"
 	"github.com/fibreactive/articlelate/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type ArticleService interface {
@@ -24,7 +25,8 @@ func NewArticleStore() *ArticleStore {
 }
 func (as *ArticleStore) GetAll() []*models.Article {
 	var articles []*models.Article
-	if err := mgm.CollectionByName("articles").SimpleFind(&articles, bson.D{}); err != nil {
+	findOptions := options.Find().SetSort(bson.M{"created_at": -1})
+	if err := mgm.CollectionByName("articles").SimpleFind(&articles, bson.M{}, findOptions); err != nil {
 		return nil
 	}
 	return articles

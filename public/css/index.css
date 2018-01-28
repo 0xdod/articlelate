@@ -11,7 +11,7 @@
 
 body{
 	display:flex;
-	flex-flow:column nowrap;
+	flex-flow: column nowrap;
 	font-family:Roboto;
 	background-color: #eee;
 	height:100vh;
@@ -28,7 +28,7 @@ header h3{
 }
 nav {
 	display:flex;
-         padding-left: 0;
+    padding-left: 0;
 }
 nav > *  {
 	margin-right:0.5em;
@@ -44,8 +44,6 @@ a, a:hover{
 footer {
 	margin-top:auto;
 	display:flex;
-	position:relative;
-	bottom:0;
 	align-items:center;
 	justify-content:center;
 }

@@ -10,13 +10,9 @@ import (
 // If the header doesn't specify this, HTML is rendered, provided that
 // the template name is present
 func (h *Handler) render(code int, c *gin.Context, data gin.H, templateName string) {
-
-	// add user model
 	if data != nil {
-		token, _ := c.Cookie("auth")
-		data["user"] = h.RetrieveUser(token)
+		data["user"] = getUserFromContext(c)
 	}
-
 	switch c.Request.Header.Get("Accept") {
 	case "application/json":
 		// Respond with JSON
@@ -29,17 +25,6 @@ func (h *Handler) render(code int, c *gin.Context, data gin.H, templateName stri
 		c.HTML(code, templateName, data)
 	}
 
-}
-
-//Helper func to help choose which func to run based on the request method
-//postFUnc handles POST request, similarly GetFunc, GET request
-func resolveGetOrPost(c *gin.Context, getFunc, postFunc func()) {
-	switch c.Request.Method {
-	case "GET":
-		getFunc()
-	case "POST":
-		postFunc()
-	}
 }
 
 func Bind(c *gin.Context, obj interface{}) error {
@@ -55,8 +40,4 @@ func getUserFromContext(c *gin.Context) *models.User {
 	}
 	user := u.(*models.User)
 	return user
-}
-
-func (h *Handler) RetrieveUser(cookie string) *models.User {
-	return h.us.FindByToken(cookie)
 }

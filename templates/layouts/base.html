@@ -10,12 +10,10 @@
 	</head>
 	<body>
 		{{ template "header" . }}
-		<div class="container row col-md-12">
-			<main class="col-md-12">
+			<main class="container">
 				{{ block "content" .}}
 			    {{ end }}
 			</main>
-		</div>
 		{{ template "footer" . }}
 		<script src="/public/js/lib/jquery.min.js"></script>
 		<script src="/public/js/lib/deparam.js"></script>

@@ -37,15 +37,7 @@ func (h *Handler) UpdateComment(c *gin.Context) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-
-	getFunc := func() {
-		h.render(http.StatusOK, c, gin.H{
-			"title":   "Edit comment",
-			"payload": comment,
-		}, "edit_comment.html")
-	}
-
-	postFunc := func() {
+	if c.Request.Method == "POST" {
 		var req CommentForm
 		if err := Bind(c, &req); err != nil {
 			c.AbortWithStatus(http.StatusBadRequest)
@@ -58,7 +50,10 @@ func (h *Handler) UpdateComment(c *gin.Context) {
 		}
 		c.Redirect(303, "/article/"+comment.Article.ID.Hex()+"/view")
 	}
-	resolveGetOrPost(c, getFunc, postFunc)
+	h.render(http.StatusOK, c, gin.H{
+		"title":   "Edit comment",
+		"payload": comment,
+	}, "edit_comment.html")
 }
 
 func (h *Handler) LikeComment(c *gin.Context) {
@@ -70,12 +65,10 @@ func (h *Handler) LikeComment(c *gin.Context) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-
 	if err := c.BindJSON(&req); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-
 	switch ParseAction(req.Action) {
 	case Like:
 		user.Like(comment)
@@ -85,7 +78,6 @@ func (h *Handler) LikeComment(c *gin.Context) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Error processing request"})
 		return
 	}
-
 	h.cs.Update(comment)
 	c.JSON(http.StatusOK, gin.H{"likes": len(comment.Likes)})
 }

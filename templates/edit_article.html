@@ -1,19 +1,27 @@
 {{define "title" }} {{.title}} {{end}}
 
 {{ define "content" }}
+{{ if .error}}
+<p> {{ .error.Error }} </p>
+{{ else }}
 <section>
     <div>
           <form method="POST">
-              <div class="form-group row mb-2">
-                   <label class="col-sm-2 col-form-label">Title:</label>
-                   <input required class="form-control" type="text" name="title" value="{{.payload.Title}}">
+              <div class="form-group row col-md-12">
+                   <label class="col-md-2 col-form-label">Title:</label>
+                   <input required class="col-md-10 form-control" type="text" name="title" value="{{.payload.Title}}">
               </div>
-               <div class="form-group row mb-2">
-              <label class="col-sm-2 col-form-label">Content:</label>
-              <textarea required class="form-control" name="content">{{.payload.Content}}</textarea>
-                 </div>
-              <button class="btn btn-primary mb-2" type="submit">Update</button>
+               <div class="form-group row col-md-12">
+              <label class="col-md-2 col-form-label">Content:</label>
+              <textarea required class="col-md-10 form-control" name="content">{{.payload.Content}}</textarea>
+              </div>
+              <div class="from-group col-md-12 text-right">
+                <button class="btn btn-primary mb-2" type="submit">Update</button>
+              </div>
           </form>
     </div>
 </section>
 {{ end }}
+{{ end }}
+
+

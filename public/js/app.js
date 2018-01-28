@@ -28,11 +28,7 @@ $(function () {
 			JSON.stringify(update),
 			function (data) {
 				like.text(data.likes);
-				var stuff =
-					nextAction === 'like'
-						? $('<i class="fa fa-thumbs-up">')
-						: $('<i class="fa fa-thumbs-down">');
-				$this.text(actions[nextAction]).prepend(stuff);
+				$this.find('i').toggleClass("fa-thumbs-up").toggleClass("fa-thumbs-down");
 				likeBtn.toggleClass('btn-secondary').toggleClass('btn-success');
 			}
 		);
@@ -67,34 +63,4 @@ $(function () {
 			confirmPw.parent().append(notify);
 		}
 	});
-
-	//display error message when logging in
-	var msg = '';
-	var cookie = decodeURIComponent(document.cookie);
-	//incase of multiple cookies separeted by ;
-	cookieArray = $(cookie.split(';'));
-	cookieArray.each(function (i, v) {
-		if (v.trim().startsWith('message')) {
-			msg = v.trim();
-		}
-	});
-	if (msg) {
-		msg = $.deparam(msg).message;
-		var target = $('#target');
-		var $msg = $("<p class='login-incorrect' style='color:red;'></p>");
-		$msg.text(msg);
-		target.prepend($msg);
-	}
 });
-
-//forms and validation
-// $(function(){
-
-// 	$('form').on('submit', function(e){
-// 		var form = $(this)
-// 		form.find(':input').not(':button').each(function(_, elem){
-// 			var value = $(this).val().trim()
-// 			$(this).val(value)
-// 		})
-// 	})
-// })

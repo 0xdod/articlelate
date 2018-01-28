@@ -10,7 +10,10 @@ import (
 
 func GetFuncMap() template.FuncMap {
 	return template.FuncMap{
-		"truncate": Truncate,
+		"truncate":   Truncate,
+		"pluralize":  Pluralize,
+		"decr":       Decrement,
+		"linebreaks": LineBreaks,
 	}
 }
 
@@ -58,4 +61,19 @@ func Truncate(limit int, content string) string {
 		newContentSlice = append(newContentSlice, v)
 	}
 	return strings.Join(newContentSlice, " ") + "..."
+}
+
+func Pluralize(count int) string {
+	if count == 1 {
+		return ""
+	}
+	return "s"
+}
+
+func Decrement(value int) int {
+	return value - 1
+}
+
+func LineBreaks(content string) string {
+	return strings.Replace(content, "\r\n", "<br>", 0)
 }

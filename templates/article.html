@@ -13,13 +13,13 @@
     </div>
 
     <div class="card-body bg-white">
-      <p class="card-text">{{.payload.Content}}</p>
+      <p class="card-text">{{ .payload.Content }}</p>
     </div>
   </article>
 
   {{if .user}}
   <div class="card-footer">
-    <div class="row col-md-12">
+    <div class="row">
         <div>
           <span class="" id="likes"> {{len .payload.Likes}}</span>
           {{if .user.LikedArticle .payload}}
@@ -30,7 +30,6 @@
             data-action="unlike"
           >
           <i class="fa fa-thumbs-down"></i>
-            Unlike
           </button>
           {{else}}
           <button
@@ -40,7 +39,6 @@
             data-action="like"
           >
           <i class="fa fa-thumbs-up"></i>
-            Like
           </button>
           {{end}}
 
@@ -130,29 +128,27 @@
 </section>
 {{end}}
 
-{{if .payload.Comments}}
-<section class="card mb-3" id="comments">
-  <h5 class="card-header">Comments</h5>
-  {{range .payload.Comments}}
-  <div class="card mb-1">
-    <div class="card-header">
+<section class="card mb-2" id="comments">
+  {{ $total_comments := len .payload.Comments }}
+  <h5 class="card-header">
+  {{ $total_comments }} Comment{{ pluralize $total_comments }}
+  </h5>
+  {{if .payload.Comments}}
+  {{ range $i, $v := .payload.Comments}}
+    <div class="ml-2 p-2">
         <strong>{{.Author.Username}}</strong> &middot;
         <em class="text-muted">{{.CreatedAt.Format "Mon Jan 2 15:04 2006"}}</em>
     </div>
-    <div class="card-body">
-      <p class="card-text">{{.Content}}</p>
+    <div class="ml-4">
+      {{html .Content}}
     </div>
-    {{if $.user}}
-    <div class="card-footer">
-       <button class="btn btn-primary">Like</button>
-       <button class="btn btn-primary">Edit</button>
-       <button class="btn btn-primary">Delete</button>
-    </div>
-    {{end}}
-  </div>
+    {{ if not (eq $i (decr $total_comments)) }} <hr class="m-0 p-0"> {{ end }}
+  {{end}}
+  {{else}}
+  <p class="text-center my-2"> No comments yet, be the first to post a comment </p>
   {{end}}
 </section>
-{{end}}
+
 
 {{if not .user}}
 <div class="text-center mb-2">

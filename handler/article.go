@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -8,57 +9,56 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) Index(c *gin.Context) {
+func (h *Handler) ArticleList(c *gin.Context) {
 	articles := h.as.GetAll()
+	var page *Page
 	paginator := NewPaginator(articles, 5)
 	if paginator == nil {
-		return
-	}
-	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
-	if err != nil {
-		page = minPage
-	}
-	posts, err := paginator.Page(page)
-	if err == EmptyPage {
-		posts, _ = paginator.Page(paginator.MaxPage)
+		page = nil
+	} else {
+
+		pageNo, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+		if err != nil {
+			pageNo = minPage
+		}
+		page, err = paginator.Page(pageNo)
+		if err == EmptyPage {
+			page, _ = paginator.Page(paginator.MaxPage)
+		}
 	}
 	h.render(http.StatusOK, c, gin.H{
 		"title": "Home",
-		"page":  posts,
+		"page":  page,
 	}, "index.html")
 }
 
-func (h *Handler) GetArticle(c *gin.Context) {
+func (h *Handler) ArticleDetail(c *gin.Context) {
 	articleID := c.Param("article_id")
 	article := h.as.GetByID(articleID)
+	status := 200
+	template := "article.html"
+	var title string
 	if article == nil {
-		h.render(http.StatusNotFound, c, gin.H{
-			"title":   "Oops",
-			"payload": article,
-		}, "404.html")
-		return
+		status = http.StatusNotFound
+		template = "404.html"
+	} else {
+		title = article.Title
+		article.Comments = h.cs.GetByArticle(article)
 	}
-	article.Comments = h.cs.GetByArticle(article)
-	h.render(http.StatusOK, c, gin.H{
-		"title":   article.Title,
+	h.render(status, c, gin.H{
+		"title":   title,
 		"payload": article,
-	}, "article.html")
+	}, template)
 }
 
 func (h *Handler) CreateArticle(c *gin.Context) {
-	getFunc := func() {
-		h.render(http.StatusOK, c, gin.H{
-			"title":   "Create New Article",
-			"payload": "",
-		}, "create_article.html")
-	}
-	postFunc := func() {
+	user := getUserFromContext(c)
+	if c.Request.Method == "POST" {
 		var req ArticleForm
 		if err := Bind(c, &req); err != nil {
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
-		user := getUserFromContext(c)
 		article := models.NewArticle(user, req.Title, req.Content)
 		if err := h.as.Create(article); err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
@@ -66,8 +66,12 @@ func (h *Handler) CreateArticle(c *gin.Context) {
 		}
 		//TODO comeback
 		c.Redirect(http.StatusSeeOther, "/article/"+article.ID.Hex()+"/view")
+		return
 	}
-	resolveGetOrPost(c, getFunc, postFunc)
+	h.render(http.StatusOK, c, gin.H{
+		"title":   "Create New Article",
+		"payload": "",
+	}, "create_article.html")
 }
 
 func (h *Handler) DeleteArticle(c *gin.Context) {
@@ -90,6 +94,7 @@ func (h *Handler) DeleteArticle(c *gin.Context) {
 }
 
 func (h *Handler) UpdateArticle(c *gin.Context) {
+	var Err error
 	articleID := c.Param("article_id")
 	article := h.as.GetByID(articleID)
 	user := getUserFromContext(c)
@@ -97,13 +102,7 @@ func (h *Handler) UpdateArticle(c *gin.Context) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-	getFunc := func() {
-		h.render(http.StatusOK, c, gin.H{
-			"title":   article.Title,
-			"payload": article,
-		}, "edit_article.html")
-	}
-	postFunc := func() {
+	if c.Request.Method == "POST" {
 		var req ArticleForm
 		if err := Bind(c, &req); err != nil {
 			c.AbortWithStatus(http.StatusBadRequest)
@@ -112,13 +111,17 @@ func (h *Handler) UpdateArticle(c *gin.Context) {
 		article.Title = req.Title
 		article.Content = req.Content
 		err := h.as.Update(article)
-		if err != nil {
-			c.String(http.StatusInternalServerError, "<h1>Internal Server Error</h1>")
+		if err == nil {
+			c.Redirect(303, "/article/"+articleID+"/view")
 			return
 		}
-		c.Redirect(303, "/article/"+articleID+"/view")
+		Err = errors.New("Internal server error")
 	}
-	resolveGetOrPost(c, getFunc, postFunc)
+	h.render(http.StatusOK, c, gin.H{
+		"title":   article.Title,
+		"payload": article,
+		"error":   Err,
+	}, "edit_article.html")
 }
 
 func (h *Handler) LikeArticle(c *gin.Context) {

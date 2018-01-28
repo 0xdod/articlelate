@@ -16,7 +16,12 @@
   </div>
   <div class="card-body">
     <form id="form-register" method="POST">
-      <div class="form-group" id="target">
+      <div class="form-group">
+        {{ if .error }}
+        <p style="color:red;">
+          {{ .error.Error }}
+        </p>
+        {{ end }}
         <label for="login">Email or Username:</label>
         <input
           class="form-control"

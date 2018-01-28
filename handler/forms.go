@@ -22,12 +22,12 @@ func (a Action) String() string {
 	return "invalid"
 }
 
-type LikeRequest struct {
-	Action string `form:"action" json:"action" binding:"required"`
-}
-
 func ParseAction(s string) Action {
 	return actionValues[s]
+}
+
+type LikeRequest struct {
+	Action string `form:"action" json:"action" binding:"required"`
 }
 
 type LoginForm struct {
