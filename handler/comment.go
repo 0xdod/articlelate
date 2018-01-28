@@ -8,7 +8,6 @@ import (
 )
 
 func (h *Handler) CreateComment(c *gin.Context) {
-	articleId := c.Param("article_id")
 	user := getUserFromContext(c)
 	if user == nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
@@ -19,14 +18,14 @@ func (h *Handler) CreateComment(c *gin.Context) {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-	article := h.as.GetByID(articleId)
+	article := h.as.GetByID(form.ArticleID)
 	comment := models.NewComment(user, article, form.Content)
 	err := h.cs.Create(comment)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-	c.Redirect(http.StatusSeeOther, "/article/"+article.ID.Hex()+"/view")
+	c.Redirect(http.StatusSeeOther, article.GetAbsoluteURL())
 }
 
 func (h *Handler) UpdateComment(c *gin.Context) {
@@ -48,12 +47,9 @@ func (h *Handler) UpdateComment(c *gin.Context) {
 			c.String(http.StatusInternalServerError, "<h1>Internal Server Error</h1>")
 			return
 		}
-		c.Redirect(303, "/article/"+comment.Article.ID.Hex()+"/view")
+		c.Redirect(303, comment.Article.GetAbsoluteURL())
 	}
-	h.render(http.StatusOK, c, gin.H{
-		"title":   "Edit comment",
-		"payload": comment,
-	}, "edit_comment.html")
+	render(c, http.StatusOK, "edit_comment.html", gin.H{"comment": comment})
 }
 
 func (h *Handler) LikeComment(c *gin.Context) {
@@ -91,11 +87,8 @@ func (h *Handler) DeleteComment(c *gin.Context) {
 		return
 	}
 	if err := h.cs.Delete(commentId); err != nil {
-		h.render(http.StatusInternalServerError, c, gin.H{
-			"title":   "Oops",
-			"payload": nil,
-		}, "404.html")
+		render(c, http.StatusInternalServerError, "404.html", gin.H{})
 		return
 	}
-	c.Redirect(http.StatusTemporaryRedirect, "/article"+comment.Article.ID.Hex()+"/view")
+	c.Redirect(http.StatusTemporaryRedirect, comment.Article.GetAbsoluteURL())
 }

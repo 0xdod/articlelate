@@ -1,0 +1,10 @@
+{{ define "post_form" }}
+  <div class="form-group">
+      <label class="col-form-label">Title:</label>
+      <input required class="form-control" type="text" name="title" {{ if .post }}value="{{.post.Title}}"{{ end }}>
+  </div>
+  <div class="form-group">
+      <label class="col-form-label">Content:</label>
+      <textarea rows="5" required class="form-control" name="content">{{ if.post}} {{- .post.Content -}} {{ end }}</textarea>
+  </div>
+{{ end }}

@@ -1,7 +1,7 @@
 package templates
 
 import (
-    "html"
+	"html"
 	"html/template"
 	"path/filepath"
 	"strings"
@@ -76,6 +76,13 @@ func Decrement(value int) int {
 }
 
 func LineBreaks(content string) template.HTML {
-    content = html.EscapeString(content)
-	return template.HTML(strings.Replace(content, "\r\n", "<br>", -1))
+	content = html.EscapeString(content)
+	content = strings.Replace(content, "\r", "", -1)
+	content = strings.Replace(content, "\n", "<br>", -1)
+	cs := strings.Split(content, "<br><br>")
+	newContent := ""
+	for _, c := range cs {
+		newContent += "<p>" + c + "</p>"
+	}
+	return template.HTML(newContent)
 }

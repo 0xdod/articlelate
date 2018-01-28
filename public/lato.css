@@ -1,0 +1,95 @@
+@font-face{
+    font-family: 'Lato';
+    font-weight: 200;
+    font-style: normal;
+    font-stretch: normal;
+    src: url('fonts/Lato-Thin.ttf') format('truetype');
+}
+
+@font-face{
+    font-family: 'Lato';
+    font-weight: 200;
+    font-style: italic;
+    font-stretch: normal;
+    src: url('fonts/Lato-ThinItalic.ttf') format('truetype');
+}
+
+@font-face{
+    font-family: 'Lato';
+    font-weight: 300;
+    font-style: normal;
+    font-stretch: normal;
+    src: url('fonts/Lato-Light.ttf') format('truetype');
+}
+
+@font-face{
+    font-family: 'Lato';
+    font-weight: 300;
+    font-style: italic;
+    font-stretch: normal;
+    src: url('fonts/Lato-LightItalic.ttf') format('truetype');
+}
+
+@font-face{
+    font-family: 'Lato';
+    font-weight: 400;
+    font-style: normal;
+    font-stretch: normal;
+    src: url('fonts/Lato-Regular.ttf') format('truetype');
+}
+
+@font-face{
+    font-family: 'Lato';
+    font-weight: 400;
+    font-style: italic;
+    font-stretch: normal;
+    src: url('fonts/Lato-MediumItalic.ttf') format('truetype');
+}
+
+@font-face{
+    font-family: 'Lato';
+    font-weight: 600;
+    font-style: normal;
+    font-stretch: normal;
+    src: url('fonts/Lato-Semibold.ttf') format('truetype');
+}
+
+@font-face{
+    font-family: 'Lato';
+    font-weight: 600;
+    font-style: italic;
+    font-stretch: normal;
+    src: url('fonts/Lato-SemiboldItalic.ttf') format('truetype');;
+}
+
+@font-face{
+    font-family: 'Lato';
+    font-weight: 700;
+    font-style: normal;
+    font-stretch: normal;
+    src: url('fonts/Lato-Bold.ttf') format('truetype');
+}
+
+@font-face{
+    font-family: 'Lato';
+    font-weight: 700;
+    font-style: italic;
+    font-stretch: normal;
+    src: url('fonts/Lato-BoldItalic.ttf') format('truetype');
+}
+
+@font-face{
+    font-family: 'Lato';
+    font-weight: 900;
+    font-style: normal;
+    font-stretch: normal;
+    src: url('fonts/Lato-Heavy.ttf') format('truetype')
+}
+
+@font-face{
+    font-family: 'Lato';
+    font-weight: 900;
+    font-style: italic;
+    font-stretch: normal;
+    src: url('fonts/Lato-HeavyItalic.ttf') format('truetype')
+}

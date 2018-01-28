@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-100">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no"/>
-		<title>{{ block "title" .}} Articelate {{ end }} | Articlelate.com</title>
+		<title>{{ block "title" .}} Articelate {{ end }} | My number one forum</title>
 		<link rel="stylesheet" href="/public/bootstrap/css/bootstrap.min.css" />
 		<link rel="stylesheet" href="/public/fontawesome/css/all.css" />
+		<link rel="stylesheet" href="/public/lato.css" />
 		<link rel="stylesheet" href="/public/css/index.css" />
 	</head>
-	<body>
+	<body class="d-flex flex-column h-100">
 		{{ template "header" . }}
-			<main class="container">
+			<main role="main" class="container">
 				{{ block "content" .}}
 			    {{ end }}
 			</main>

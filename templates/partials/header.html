@@ -1,74 +1,62 @@
 {{ define "header" }}
-<header class="text-white bg-dark">
-	<h3>ArticleLate</h3>
-	{{if . }}
-	<nav class="navbar navbar-expand-md navbar-dark bg-dark">
-		<a class="navbar-brand" href="/">Home</a>
-
-		{{if .user }}
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+	<h3><a class="navbar-brand" href="/">Articlelate</a></h3>
+	<button
+		class="navbar-toggler"
+		type="button"
+		data-toggle="collapse"
+		data-target="#navbarCollapse"
+		aria-controls="navbarCollapse"
+		aria-expanded="false"
+		aria-label="Toggle navigation"
+	>
+		<span class="navbar-toggler-icon"></span>
+	</button>
+	<div class="collapse navbar-collapse" id="navbarCollapse">
+		{{ if .user }}
 		<ul class="navbar-nav mr-auto">
 			<li class="nav-item">
-				<a class="btn btn-dark" href="/article/">
-					<i class="fa fa-plus"></i>
-					New
+				<a class="btn btn-dark" href="/p/">
+					<i class="fa fa-plus"></i> New Post
 				</a>
 			</li>
 		</ul>
+		<form class="form-inline my-2 my-md-0">
+      		<input class="form-control mb-2 mr-0 mr-sm-2 mb-sm-0" type="text" placeholder="Search">
+      		<button class="btn btn-outline-success">Search</button>
+    	</form>
+		<ul class="navbar-nav mx-4">
+			<li class="nav-item dropdown">
+				<a
+					href="#"
+					class="nav-link dropdown-toggle"
+					id="userMenu"
+					data-toggle="dropdown"
+					aria-haspopup="true"
+					aria-expanded="false"
+				>
+					{{ .user.Username }}
+				</a>
+				<div
+					class="dropdown-menu"
+					aria-labelledby="userMenu"
+				>
+					<a class="dropdown-item" href="#">Profile</a>
+					<div class="dropdown-divider"></div>
+					<form class="form-inline dropdown-item" method="POST" action="/u/logout">
+						<button type="submit" class="btn btn-dark btn-sm" id="logout">
+							Logout
+						</button>
+					</form>
+				</div>
+			</li>
+		</ul>
+		{{else}}
+		<form class="form-inline ml-auto">
+			<a href="/u/login" class="btn btn-outline-secondary btn-sm">Log in</a>
+			<a href="/u/register" class="btn btn-primary ml-2 btn-sm">Sign up</a>
+		</form>
 		{{end}}
-		<div class="ml-auto">
-			<button
-			class="navbar-toggler"
-			type="button"
-			data-toggle="collapse"
-			data-target="#navbarCollapse"
-			aria-controls="navbarCollapse"
-			aria-expanded="false"
-			aria-label="Toggle navigation"
-		>
-			<span class="navbar-toggler-icon"></span>
-		</button>
-		</div>
-		
-		<div class="collapse navbar-collapse" id="navbarCollapse">
-			{{ if .user }}
-			<ul class="navbar-nav ml-auto">
-				<li class="nav-item">
-					<a
-						href="#"
-						class="nav-link dropdown-toggle"
-						id="userMenu"
-						data-toggle="dropdown"
-						aria-haspopup="true"
-						aria-expanded="false"
-					>
-						{{ .user.Username }}
-					</a>
-					<div
-						class="dropdown-menu dropdown-menu-right"
-						aria-labelledby="userMenu"
-					>
-						<a href="#">Profile</a>
-						<div class="dropdown-divider"></div>
-						<form class="px-2" method="POST" action="/u/logout">
-							<button
-								type="submit"
-								class="btn btn-dark"
-								id="logout"
-							>
-								Logout
-							</button>
-						</form>
-					</div>
-				</li>
-			</ul>
-			{{else}}
-			<form class="form-inline ml-auto">
-				<a href="/u/login" class="btn btn-outline-secondary">Log in</a>
-				<a href="/u/register" class="btn btn-primary ml-2">Sign up</a>
-			</form>
-			{{end}}
-		</div>
-	</nav>
-	{{ end }}
-</header>
+	</div>
+</nav>
 {{ end }}

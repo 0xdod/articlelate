@@ -9,10 +9,8 @@ import (
 // Render one of HTML, JSON or CSV based on the 'Accept' header of the request
 // If the header doesn't specify this, HTML is rendered, provided that
 // the template name is present
-func (h *Handler) render(code int, c *gin.Context, data gin.H, templateName string) {
-	if data != nil {
-		data["user"] = getUserFromContext(c)
-	}
+func render(c *gin.Context, code int, templateName string, data gin.H) {
+	data["user"] = addUserToTemplateContext(c)
 	switch c.Request.Header.Get("Accept") {
 	case "application/json":
 		// Respond with JSON
@@ -24,7 +22,6 @@ func (h *Handler) render(code int, c *gin.Context, data gin.H, templateName stri
 		// Respond with HTML
 		c.HTML(code, templateName, data)
 	}
-
 }
 
 func Bind(c *gin.Context, obj interface{}) error {
@@ -40,4 +37,12 @@ func getUserFromContext(c *gin.Context) *models.User {
 	}
 	user := u.(*models.User)
 	return user
+}
+
+func addUserToTemplateContext(c *gin.Context) *models.User {
+	token, err := c.Cookie("auth")
+	if err != nil {
+		return nil
+	}
+	return dh.us.FindByToken(token)
 }

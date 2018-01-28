@@ -7,6 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var dh *Handler
+
 type Handler struct {
 	us service.UserService
 	as service.ArticleService
@@ -17,16 +19,14 @@ func NewHandler() *Handler {
 	us := service.NewUserStore()
 	as := service.NewArticleStore()
 	cs := service.NewCommentStore()
-	return &Handler{
+	dh = &Handler{
 		us: us,
 		as: as,
 		cs: cs,
 	}
+	return dh
 }
 
 func (h *Handler) NotFound(c *gin.Context) {
-	h.render(http.StatusNotFound, c, gin.H{
-		"title":   "Content not found",
-		"payload": "",
-	}, "404.html")
+	render(c, http.StatusNotFound, "404.html", gin.H{})
 }

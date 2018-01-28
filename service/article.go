@@ -14,6 +14,7 @@ type ArticleService interface {
 	Create(*models.Article) error
 	Update(*models.Article) error
 	Delete(id interface{}) error
+	Get(filter interface{}) *models.Article
 }
 
 //TODO
@@ -38,6 +39,10 @@ func (*ArticleStore) query(filter interface{}) *models.Article {
 		return nil
 	}
 	return &article
+}
+
+func (a *ArticleStore) Get(filter interface{}) *models.Article {
+	return a.query(filter)
 }
 
 func (as *ArticleStore) Create(a *models.Article) error {

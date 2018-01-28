@@ -7,6 +7,7 @@ import (
 
 	"github.com/fibreactive/articlelate/models"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func (h *Handler) ArticleList(c *gin.Context) {
@@ -26,30 +27,23 @@ func (h *Handler) ArticleList(c *gin.Context) {
 			page, _ = paginator.Page(paginator.MaxPage)
 		}
 	}
-	h.render(http.StatusOK, c, gin.H{
-		"title": "Home",
-		"page":  page,
-	}, "index.html")
+	render(c, http.StatusOK, "post_list.html", gin.H{"page": page})
 }
 
 func (h *Handler) ArticleDetail(c *gin.Context) {
-	articleID := c.Param("article_id")
-	article := h.as.GetByID(articleID)
-	status := 200
-	templateName := "article.html"
-	var title string
+	slug := c.Param("slug")
+	u := c.Param("u")
+	filter := bson.M{"author.username": u, "slug": slug}
+	article := h.as.Get(filter)
+	status := http.StatusOK
+	templateName := "post_detail.html"
 	if article == nil {
-		title = "Content not found"
 		status = http.StatusNotFound
 		templateName = "404.html"
 	} else {
-		title = article.Title
 		article.Comments = h.cs.GetByArticle(article)
 	}
-	h.render(status, c, gin.H{
-		"title":   title,
-		"payload": article,
-	}, templateName)
+	render(c, status, templateName, gin.H{"post": article})
 }
 
 func (h *Handler) CreateArticle(c *gin.Context) {
@@ -65,30 +59,26 @@ func (h *Handler) CreateArticle(c *gin.Context) {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		//TODO comeback
-		c.Redirect(http.StatusSeeOther, "/article/"+article.ID.Hex()+"/view")
+		//@TODO comeback
+		c.Redirect(http.StatusSeeOther, article.GetAbsoluteURL())
 		return
 	}
-	h.render(http.StatusOK, c, gin.H{
-		"title":   "Create New Article",
-		"payload": "",
-	}, "create_article.html")
+	render(c, http.StatusOK, "create_post.html", gin.H{})
 }
 
 func (h *Handler) DeleteArticle(c *gin.Context) {
-	articleID := c.Param("article_id")
-	article := h.as.GetByID(articleID)
+	slug := c.Param("slug")
+	u := c.Param("u")
+	filter := bson.M{"author.username": u, "slug": slug}
+	article := h.as.Get(filter)
 	user := getUserFromContext(c)
 	if user == nil || user.ID != article.Author.ID {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-	err := h.as.Delete(articleID)
+	err := h.as.Delete(article.ID)
 	if err != nil {
-		h.render(http.StatusNotFound, c, gin.H{
-			"title":   "Oops",
-			"payload": article,
-		}, "404.html")
+		render(c, http.StatusNotFound, "404.html", gin.H{"post": article})
 		return
 	}
 	c.Redirect(303, "/")
@@ -96,8 +86,10 @@ func (h *Handler) DeleteArticle(c *gin.Context) {
 
 func (h *Handler) UpdateArticle(c *gin.Context) {
 	var Err error
-	articleID := c.Param("article_id")
-	article := h.as.GetByID(articleID)
+	slug := c.Param("slug")
+	u := c.Param("u")
+	filter := bson.M{"author.username": u, "slug": slug}
+	article := h.as.Get(filter)
 	user := getUserFromContext(c)
 	if user == nil || user.ID != article.Author.ID {
 		c.AbortWithStatus(http.StatusUnauthorized)
@@ -113,33 +105,30 @@ func (h *Handler) UpdateArticle(c *gin.Context) {
 		article.Content = req.Content
 		err := h.as.Update(article)
 		if err == nil {
-			c.Redirect(303, "/article/"+articleID+"/view")
+			c.Redirect(303, article.GetAbsoluteURL())
 			return
 		}
 		Err = errors.New("Internal server error")
 	}
-	h.render(http.StatusOK, c, gin.H{
-		"title":   article.Title,
-		"payload": article,
-		"error":   Err,
-	}, "edit_article.html")
+	render(c, http.StatusOK, "edit_post.html", gin.H{
+		"post":  article,
+		"error": Err,
+	})
 }
 
 func (h *Handler) LikeArticle(c *gin.Context) {
 	var req LikeRequest
-	articleID := c.Param("article_id")
+	if err := c.BindJSON(&req); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+	articleID := req.ArticleID
 	article := h.as.GetByID(articleID)
 	user := getUserFromContext(c)
 	if user == nil || article == nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-
-	if err := c.BindJSON(&req); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
-
 	switch ParseAction(req.Action) {
 	case Like:
 		user.Like(article)
@@ -149,7 +138,6 @@ func (h *Handler) LikeArticle(c *gin.Context) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Error processing request"})
 		return
 	}
-
 	h.as.Update(article)
 	c.JSON(http.StatusOK, gin.H{"likes": len(article.Likes)})
 }

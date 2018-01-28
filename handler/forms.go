@@ -27,7 +27,8 @@ func ParseAction(s string) Action {
 }
 
 type LikeRequest struct {
-	Action string `form:"action" json:"action" binding:"required"`
+	ArticleID string `form:"article_id" json:"articleID" binding:"required"`
+	Action    string `form:"action" json:"action" binding:"required"`
 }
 
 type LoginForm struct {
@@ -42,7 +43,8 @@ type SignUpForm struct {
 }
 
 type CommentForm struct {
-	Content string `form:"content" json:"content"  binding:"required,min=1"`
+	ArticleID string `form:"article_id" json:"articleID" binding:"required,min=1"`
+	Content   string `form:"content" json:"content"  binding:"required,min=1"`
 }
 
 type ArticleForm struct {

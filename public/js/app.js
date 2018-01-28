@@ -22,17 +22,16 @@ $(function () {
 		$this.data('action', nextAction);
 		var update = {
 			action: currentAction,
+			articleID: $this.data("id")
 		};
 		$.post(
-			'/article/' + $this.data('id') + '/like',
+			$this.data("url"),
 			JSON.stringify(update),
 			function (data) {
 				like.text(data.likes);
 				$this
 					.find('i')
-					.toggleClass('fa-thumbs-up')
-					.toggleClass('fa-thumbs-down');
-				likeBtn.toggleClass('btn-secondary').toggleClass('btn-success');
+					.toggleClass('heart-liked fas')
 			}
 		);
 	});

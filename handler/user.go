@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) Register(c *gin.Context) {
+func (h *Handler) Signup(c *gin.Context) {
 	if c.Request.Method == "POST" {
 		var req SignUpForm
 		if err := Bind(c, &req); err != nil {
@@ -28,7 +28,7 @@ func (h *Handler) Register(c *gin.Context) {
 		c.Redirect(http.StatusSeeOther, "/")
 		return
 	}
-	h.render(http.StatusOK, c, nil, "register.html")
+	render(c, http.StatusOK, "register.html", gin.H{})
 }
 
 func (h *Handler) Login(c *gin.Context) {
@@ -55,7 +55,7 @@ func (h *Handler) Login(c *gin.Context) {
 		c.Redirect(http.StatusSeeOther, "/")
 		return
 	}
-	h.render(http.StatusOK, c, gin.H{"error": Err}, "login.html")
+	render(c, http.StatusOK, "login.html", gin.H{"error": Err})
 }
 
 func (h *Handler) Logout(c *gin.Context) {
