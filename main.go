@@ -34,7 +34,8 @@ func main() {
 	as := service.NewArticleStore()
 	cs := service.NewCommentStore()
 	h := handler.NewHandler(us, as, cs)
+	gin.SetMode(gin.ReleaseMode)
 
 	Routes(r, h)
-	r.Run(":8000")
+	r.Run()
 }
