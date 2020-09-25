@@ -1,0 +1,15 @@
+{{ define "pagination" }}
+<div class="pagination">
+	<span class="step-links">
+		{{ if .HasPrevious }}
+		  <a href="?page={{ .PreviousPage }}">Previous</a>
+		{{ end }}
+		<span class="current">
+			Page {{ .Paginator.CurrentPage }} of {{ .Paginator.MaxPage }}.
+		</span>
+		{{ if .HasNext }}
+		  <a href="?page={{ .NextPage }}">Next</a>
+		{{ end }}
+	</span>
+</div>
+{{ end }}

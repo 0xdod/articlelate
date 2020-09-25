@@ -1,0 +1,157 @@
+{{define "title" }} {{.title}} {{end}}
+
+{{ define "content"}}
+
+<section id="article" class="card mb-3">
+  <article>
+    <div class="card-header">
+      <strong class="font-weight-bolder">{{.payload.Title}}</strong>
+      <span class="text-muted font-italic">
+        &middot; by <strong>{{.payload.Author.Username}}</strong> on
+        {{.payload.CreatedAt.Format "Mon Jan 2 15:04 2006"}}
+      </span>
+    </div>
+
+    <div class="card-body bg-white">
+      <p class="card-text">{{.payload.Content}}</p>
+    </div>
+  </article>
+
+  {{if .user}}
+  <div class="card-footer">
+    <div class="row col-md-12">
+        <div>
+          <span class="" id="likes"> {{len .payload.Likes}}</span>
+          {{if .user.LikedArticle .payload}}
+          <button
+            id="like-btn"
+            class="btn btn-secondary"
+            data-id="{{.payload.ID.Hex}}"
+            data-action="unlike"
+          >
+          <i class="fa fa-thumbs-down"></i>
+            Unlike
+          </button>
+          {{else}}
+          <button
+            id="like-btn"
+            class="btn btn-success"
+            data-id="{{.payload.ID.Hex}}"
+            data-action="like"
+          >
+          <i class="fa fa-thumbs-up"></i>
+            Like
+          </button>
+          {{end}}
+
+        {{if .user.OwnsArticle .payload}}
+        <a href="/article/{{.payload.ID.Hex}}/edit" class="btn btn-warning"
+          >Edit</a
+        >
+      </div>
+
+      <div class="ml-auto">
+        <button
+          type="button"
+          class="btn btn-danger"
+          data-toggle="modal"
+          data-target="#deleteModal"
+        >
+          <i class="fa fa-times"></i>
+          Delete
+        </button>
+      </div>
+
+      <!-- Modal -->
+      <div
+        class="modal fade"
+        id="deleteModal"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="deleteModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="deleteModalLabel">DELETE</h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>
+                Are you sure you want to delete this post? This action is
+                irreversible.
+              </p>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
+              <form
+                action="/article/{{.payload.ID.Hex}}/delete"
+                method="POST"
+                class="mr-2"
+              >
+                <button class="btn btn-danger">Yes Delete</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{end}}
+  </div>
+  {{end}}
+</section>
+
+{{if .user}}
+<section class="col-md-6 mb-3" id="write-comment">
+  <h5>Post your comment</h5>
+  <form method="POST" action="/article/{{.payload.ID.Hex}}/comment">
+    <input type="hidden" name="article_id" value="{{.payload.ID.Hex}}" />
+
+    <div class="form-group">
+      <textarea class="form-control" name="content" id="comment-body" required></textarea>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Comment</button>
+  </form>
+</section>
+{{end}}
+
+{{if .payload.Comments}}
+<section class="card mb-3" id="comments">
+  <h5 class="card-header">Comments</h5>
+  {{range .payload.Comments}}
+  <div class="card p-2">
+    <div class="card-body">
+      <div class="card-title">
+        <strong>{{.Author.Username}}</strong> &middot;
+        <em class="text-muted">{{.CreatedAt.Format "Mon Jan 2 15:04 2006"}}</em>
+      </div>
+      <p class="card-text">{{.Content}}</p>
+    </div>
+  </div>
+  {{end}}
+</section>
+{{end}}
+
+{{if not .user}}
+<div class="text-center mb-2">
+  <p>
+    <a href="/u/login">Login</a> or <a href="/u/register">Sign up</a> to post a
+    comment
+  </p>
+</div>
+{{end}} {{ end }}
