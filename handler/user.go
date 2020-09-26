@@ -27,8 +27,8 @@ func (h *Handler) Register(c *gin.Context) {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		c.SetCookie("auth", token, 0, "/", "localhost", false, true)
-		c.Redirect(http.StatusSeeOther, "/")
+		c.SetCookie("auth", token, 0, "/", "", false, true)
+		c.Redirect(http.StatusSeeOther, "/u/login")
 
 	}
 	resolveGetOrPost(c, getFunc, postFunc)
@@ -41,13 +41,13 @@ func (h *Handler) Login(c *gin.Context) {
 	postFunc := func() {
 		var req LoginForm
 		if err := Bind(c, &req); err != nil {
-			c.SetCookie("message", "Login details incorrect try again", 1, "/", "localhost", false, false)
+			c.SetCookie("message", "Login details incorrect try again", 1, "/", "", false, false)
 			c.Redirect(http.StatusSeeOther, "/u/login")
 			return
 		}
 		user := h.us.Authenticate(req.Login, req.Password)
 		if user == nil {
-			c.SetCookie("message", "Login details incorrect try again", 1, "/", "localhost", false, false)
+			c.SetCookie("message", "Login details incorrect try again", 1, "/", "", false, false)
 			c.Redirect(http.StatusSeeOther, "/u/login")
 			return
 		}
@@ -56,7 +56,7 @@ func (h *Handler) Login(c *gin.Context) {
 			c.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		c.SetCookie("auth", token, 0, "/", "localhost", false, true)
+		c.SetCookie("auth", token, 0, "/", "", false, true)
 		c.Redirect(http.StatusSeeOther, "/")
 	}
 	resolveGetOrPost(c, getFunc, postFunc)
@@ -72,7 +72,7 @@ func (h *Handler) Logout(c *gin.Context) {
 		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
-	c.SetCookie("auth", "", -1, "/", "localhost", false, true)
+	c.SetCookie("auth", "", -1, "/", "", false, true)
 	c.Redirect(http.StatusSeeOther, "/")
 }
 

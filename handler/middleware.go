@@ -14,7 +14,7 @@ func (h *Handler) Authorize() gin.HandlerFunc {
 		}
 		user := h.us.FindByToken(token)
 		if user == nil {
-			c.SetCookie("auth", "", 0, "/", "localhost", false, true)
+			c.SetCookie("auth", "", 0, "/", "", false, true)
 			c.AbortWithStatus(http.StatusUnauthorized)
 		}
 		c.Set("user", user)
