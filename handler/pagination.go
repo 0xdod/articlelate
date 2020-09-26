@@ -29,6 +29,9 @@ type Paginator struct {
 }
 
 func NewPaginator(objectList []*models.Article, limit int) *Paginator {
+	if objectList == nil {
+		return nil
+	}
 	var maxPage = int(math.Ceil(float64(len(objectList)) / float64(limit)))
 	return &Paginator{
 		MaxPage:     maxPage,

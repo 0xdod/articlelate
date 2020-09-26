@@ -9,6 +9,7 @@ type Comment struct {
 	Article          *Article `json:"article" bson:"article"`
 	Author           *User    `json:"author" bson:"author"`
 	Content          string   `json:"content" bson:"content"`
+	Likes            []string `json:"content" bson:"likes"`
 }
 
 func NewComment(author *User, article *Article, content string) *Comment {

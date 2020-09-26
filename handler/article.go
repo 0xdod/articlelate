@@ -10,12 +10,10 @@ import (
 
 func (h *Handler) Index(c *gin.Context) {
 	articles := h.as.GetAll()
-	if articles == nil {
-		c.Header("Content-Type", "text/html")
-		c.String(http.StatusInternalServerError, "<h1>Internal server error</h1>")
+	paginator := NewPaginator(articles, 5)
+	if paginator == nil {
 		return
 	}
-	paginator := NewPaginator(articles, 5)
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil {
 		page = minPage
@@ -140,9 +138,9 @@ func (h *Handler) LikeArticle(c *gin.Context) {
 
 	switch ParseAction(req.Action) {
 	case Like:
-		user.LikeArticle(article)
+		user.Like(article)
 	case Unlike:
-		user.UnlikeArticle(article)
+		user.Unlike(article)
 	default:
 		c.JSON(http.StatusForbidden, gin.H{"error": "Error processing request"})
 		return

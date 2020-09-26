@@ -13,6 +13,7 @@ func Routes(router *gin.Engine, handler *handler.Handler) {
 	private.Use(handler.Authorize())
 	articlePrivate := private.Group("/article")
 	userPrivate := private.Group("/u")
+	commentPriv := private.Group("/comment")
 	{
 		userPrivate.POST("/logout", handler.Logout)
 		userPrivate.GET("/article/create", handler.CreateArticle)
@@ -22,6 +23,9 @@ func Routes(router *gin.Engine, handler *handler.Handler) {
 		articlePrivate.GET("/:article_id/edit", handler.UpdateArticle)
 		articlePrivate.POST("/:article_id/edit", handler.UpdateArticle)
 		articlePrivate.POST("/:article_id/like", handler.LikeArticle)
+		commentPriv.POST("/:comment_id/delete", handler.DeleteComment)
+		commentPriv.POST("/:comment_id/edit", handler.UpdateComment)
+		commentPriv.POST("/:comment_id/like", handler.LikeComment)
 	}
 
 	//PUBLIC ROUTES

@@ -134,14 +134,21 @@
 <section class="card mb-3" id="comments">
   <h5 class="card-header">Comments</h5>
   {{range .payload.Comments}}
-  <div class="card p-2">
-    <div class="card-body">
-      <div class="card-title">
+  <div class="card mb-1">
+    <div class="card-header">
         <strong>{{.Author.Username}}</strong> &middot;
         <em class="text-muted">{{.CreatedAt.Format "Mon Jan 2 15:04 2006"}}</em>
-      </div>
+    </div>
+    <div class="card-body">
       <p class="card-text">{{.Content}}</p>
     </div>
+    {{if $.user}}
+    <div class="card-footer">
+       <button class="btn btn-primary">Like</button>
+       <button class="btn btn-primary">Edit</button>
+       <button class="btn btn-primary">Delete</button>
+    </div>
+    {{end}}
   </div>
   {{end}}
 </section>
@@ -154,4 +161,5 @@
     comment
   </p>
 </div>
-{{end}} {{ end }}
+{{end}}
+{{ end }}

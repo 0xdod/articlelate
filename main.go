@@ -17,7 +17,7 @@ import (
 func init() {
 	MONGO_URI := os.Getenv("MONGO_URI")
 	if MONGO_URI == "" {
-		MONGO_URI = "localhost:27017"
+		MONGO_URI = "mongodb://localhost:27017"
 	}
 	options := options.Client().ApplyURI(MONGO_URI)
 	err := mgm.SetDefaultConfig(nil, "articlelate", options)
@@ -34,8 +34,7 @@ func main() {
 	as := service.NewArticleStore()
 	cs := service.NewCommentStore()
 	h := handler.NewHandler(us, as, cs)
-	gin.SetMode(gin.ReleaseMode)
-
 	Routes(r, h)
+	//gin.SetMode(gin.ReleaseMode)
 	r.Run()
 }

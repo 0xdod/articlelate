@@ -42,23 +42,48 @@ func (u *User) LikedArticle(a *Article) bool {
 	return false
 }
 
-func (u *User) LikeArticle(a *Article) {
-	for _, v := range a.Likes {
-		if v == u.Username {
-			return
+func (u *User) Like(obj interface{}) {
+	switch obj := obj.(type) {
+	case *Comment:
+		for _, v := range obj.Likes {
+			if v == u.Username {
+				return
+			}
 		}
+		obj.Likes = append(obj.Likes, u.Username)
+
+	case *Article:
+		for _, v := range obj.Likes {
+			if v == u.Username {
+				return
+			}
+		}
+		obj.Likes = append(obj.Likes, u.Username)
 	}
-	a.Likes = append(a.Likes, u.Username)
 }
 
-func (u *User) UnlikeArticle(article *Article) {
-	for i, v := range article.Likes {
-		if v == u.Username {
-			firstHalf := article.Likes[:i]
-			secondHalf := article.Likes[i+1:]
-			fullSlice := append(firstHalf, secondHalf...)
-			article.Likes = fullSlice
-			break
+func (u *User) Unlike(obj interface{}) {
+	switch obj := obj.(type) {
+	case *Comment:
+		for i, v := range obj.Likes {
+			if v == u.Username {
+				firstHalf := obj.Likes[:i]
+				secondHalf := obj.Likes[i+1:]
+				fullSlice := append(firstHalf, secondHalf...)
+				obj.Likes = fullSlice
+				break
+			}
+		}
+	case *Article:
+		for i, v := range obj.Likes {
+			if v == u.Username {
+				firstHalf := obj.Likes[:i]
+				secondHalf := obj.Likes[i+1:]
+				fullSlice := append(firstHalf, secondHalf...)
+				obj.Likes = fullSlice
+				break
+			}
 		}
 	}
+
 }
