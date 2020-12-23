@@ -6,16 +6,16 @@ import (
 
 type Comment struct {
 	mgm.DefaultModel `bson:",inline"`
-	Article          *Article `json:"article" bson:"article"`
-	Author           *User    `json:"author" bson:"author"`
-	Content          string   `json:"content" bson:"content"`
-	Likes            []string `json:"content" bson:"likes"`
+	Post             *Post    `bson:"post"`
+	Author           *User    `bson:"author"`
+	Content          string   `bson:"content"`
+	Likes            []string `bson:"likes"`
 }
 
-func NewComment(author *User, article *Article, content string) *Comment {
+func NewComment(a *User, p *Post, c string) *Comment {
 	return &Comment{
-		Article: article,
-		Author:  author,
-		Content: content,
+		Post:    p,
+		Author:  a,
+		Content: c,
 	}
 }

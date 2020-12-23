@@ -1,31 +1,21 @@
-{{ define "title"}}Posts{{ end }}
-
-{{define "content" }}
-{{ if not .page }}
-	<div>
-		<h1>No posts yet</h1>
-	</div>
-{{ else }}
-	{{range .page.Items}}
-		<div class="card mb-2">
-			<div class="card-body">
-				<a class="text-decoration-none" href="{{ .GetAbsoluteURL }}">
-					<h5>{{.Title}}</h5>
-				</a>
-				<p class="card-text">
-				  {{$limit := 280}} 
-				  {{if not (ge $limit (len .Content))}}
-					{{truncate $limit .Content}}
-					<a href="{{ .GetAbsoluteURL }}" class="text-info"><strong>Read more</strong></a>
-				  {{else}}
-					{{.Content}}
-				</p>
-				{{end}}
-			</div>
-		</div>
-	{{end}}
-	{{ with .page }}
-		{{template "pagination" .}}
-	{{ end }}
-{{ end }}
-{{ end }}
+{{ define "title"}}Posts{{ end }} {{define "content" }} {{ if not .page }}
+<div>
+  <h1>No posts yet</h1>
+</div>
+{{ else }} {{ if .search }}
+<h2>Showing search results containing "{{ .search }}"</h2>
+{{ end }} {{range .page.Items}}
+<div class="card mb-2">
+  <div class="card-body">
+    <a class="text-decoration-none" href="{{ .GetAbsoluteURL }}">
+      <h5>{{.Title}}</h5>
+    </a>
+    <p class="card-text">
+      {{$limit := 280}} {{if not (ge $limit (len .Content))}} {{truncate $limit .Content}}
+      <a href="{{ .GetAbsoluteURL }}" class="text-info"><strong>Read more</strong></a>
+      {{else}} {{.Content}}
+    </p>
+    {{end}}
+  </div>
+</div>
+{{end}} {{ with .page }} {{template "pagination" .}} {{ end }} {{ end }} {{ end }}

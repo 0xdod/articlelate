@@ -7,7 +7,7 @@ import (
 )
 
 type CommentService interface {
-	GetByArticle(*models.Article) []*models.Comment
+	GetByPost(*models.Post) []*models.Comment
 	GetByID(id interface{}) *models.Comment
 	Create(*models.Comment) error
 	Update(*models.Comment) error
@@ -28,9 +28,9 @@ func (*CommentStore) query(filter interface{}) *models.Comment {
 	return &comment
 }
 
-func (cs *CommentStore) GetByArticle(a *models.Article) []*models.Comment {
+func (cs *CommentStore) GetByPost(p *models.Post) []*models.Comment {
 	var comments []*models.Comment
-	if err := mgm.CollectionByName("comments").SimpleFind(&comments, bson.M{"article._id": a.ID}); err != nil {
+	if err := mgm.CollectionByName("comments").SimpleFind(&comments, bson.M{"post._id": p.ID}); err != nil {
 		return nil
 	}
 	return comments

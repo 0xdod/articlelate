@@ -4,15 +4,15 @@ import (
 	"github.com/Kamva/mgm/v3"
 )
 
+// revise user authentication flow
 type User struct {
-	// DefaultModel add _id,created_at and updated_at fields to the Model
 	mgm.DefaultModel `bson:",inline"`
-	Username         string   `json:"username" bson:"username"`
-	Email            string   `json:"email" bson:"email"`
-	Followers        int      `json:"followers" bson:"followers"`
-	Following        int      `json:"following" bson:"following"`
-	Password         string   `json:"password" bson:"-"`
-	PasswordHash     string   `json:"passwordHash" bson:"passwordHash"`
+	Username         string   `bson:"username"`
+	Email            string   `bson:"email"`
+	Followers        int      `bson:"followers"`
+	Following        int      `bson:"following"`
+	Password         string   `bson:"-"`
+	PasswordHash     string   `bson:"passwordHash"`
 	Tokens           []*Token `bson:"tokens"`
 }
 
@@ -29,12 +29,12 @@ func NewUser(name, email, pswd string) *User {
 	}
 }
 
-func (u *User) OwnsArticle(a *Article) bool {
-	return u.Username == a.Author.Username
+func (u *User) OwnsPost(p *Post) bool {
+	return u.Username == p.Author.Username
 }
 
-func (u *User) LikedArticle(a *Article) bool {
-	for _, username := range a.Likes {
+func (u *User) LikedPost(p *Post) bool {
+	for _, username := range p.Likes {
 		if username == u.Username {
 			return true
 		}
@@ -52,7 +52,7 @@ func (u *User) Like(obj interface{}) {
 		}
 		obj.Likes = append(obj.Likes, u.Username)
 
-	case *Article:
+	case *Post:
 		for _, v := range obj.Likes {
 			if v == u.Username {
 				return
@@ -74,7 +74,7 @@ func (u *User) Unlike(obj interface{}) {
 				break
 			}
 		}
-	case *Article:
+	case *Post:
 		for i, v := range obj.Likes {
 			if v == u.Username {
 				firstHalf := obj.Likes[:i]
@@ -85,5 +85,4 @@ func (u *User) Unlike(obj interface{}) {
 			}
 		}
 	}
-
 }

@@ -1,5 +1,7 @@
 package main
 
+// Write tests
+
 import (
 	"log"
 	"os"

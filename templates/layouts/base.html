@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no"/>
-		<title>{{ block "title" .}} Articelate {{ end }} | My number one forum</title>
+		<title>{{ block "title" .}}Forumlate{{ end }} | My number one forum</title>
 		<link rel="stylesheet" href="/public/bootstrap/css/bootstrap.min.css" />
 		<link rel="stylesheet" href="/public/fontawesome/css/all.css" />
 		<link rel="stylesheet" href="/public/lato.css" />
@@ -20,5 +20,6 @@
 		<script src="/public/js/lib/deparam.js"></script>
 		<script src="/public/bootstrap/js/bootstrap.bundle.min.js"></script>
 		<script src="/public/js/app.js"></script>
+		{{ block "scripts" . }} {{ end }}
 	</body>
 </html>

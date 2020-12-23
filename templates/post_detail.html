@@ -24,13 +24,13 @@
               class="mr-2 u-pointer"
               data-id="{{.post.ID.Hex}}"
               data-url="{{.post.GetAbsoluteURL}}/like"
-              data-action="{{if .user.LikedArticle .post }}un{{ end }}like"
+              data-action="{{if .user.LikedPost .post }}un{{ end }}like"
               >
-              <i class="{{if .user.LikedArticle .post }}heart-liked fas {{ end }}far fa-heart"></i>    
+              <i class="{{if .user.LikedPost .post }}heart-liked fas {{ end }}far fa-heart"></i>    
             </span>
             <span class="" id="likes"> {{len .post.Likes}} </span>
         </div>
-        {{if .user.OwnsArticle .post}}
+        {{if .user.OwnsPost .post}}
         <div>
           <a href="{{ .post.GetAbsoluteURL }}/edit" class="text-dark">
             <i class="fas fa-edit"></i>
@@ -102,7 +102,7 @@
 <section class="col-md-4 mb-3" id="write-comment">
   <h5>Post your comment</h5>
   <form method="POST" action="/comment">
-    <input type="hidden" name="article_id" value="{{.post.ID.Hex}}" />
+    <input type="hidden" name="post_id" value="{{.post.ID.Hex}}" />
     <div class="form-group">
       <textarea class="form-control" name="content" id="comment-body" required></textarea>
     </div>
@@ -142,4 +142,46 @@
   </p>
 </div>
 {{end}}
+{{ end }}
+
+{{ define "scripts" }}
+<script>
+$(function () {
+  //like functionality
+  var actions = { like: 'Like', unlike: 'Unlike' };
+  var likeBtn = $('#like-btn');
+  var like = $('#likes');
+  var likeCount = parseInt(like.text());
+  likeBtn.on('click', function (e) {
+    var $this = $(this);
+    var currentAction = $this.data('action').toLowerCase();
+    var nextAction = null;
+
+    e.preventDefault();
+    if (currentAction === actions.unlike.toLowerCase()) {
+      likeCount--;
+      nextAction = actions.like.toLowerCase();
+    } else {
+      likeCount++;
+      nextAction = actions.unlike.toLowerCase();
+    }
+    //set next action
+    $this.data('action', nextAction);
+    var update = {
+      action: currentAction,
+      postID: $this.data("id")
+    };
+    $.post(
+      $this.data("url"),
+      JSON.stringify(update),
+      function (data) {
+        like.text(data.likes);
+        $this
+          .find('i')
+          .toggleClass('heart-liked fas')
+      }
+    );
+  });
+});
+</script>
 {{ end }}
