@@ -1,14 +1,14 @@
 {{ define "pagination" }}
 <div class="pagination py-2">
 	<span class="step-links">
-		{{ if .HasPrevious }}
-		  <a href="?page={{ .PreviousPage }}">Previous</a>
+		{{ if .page.HasPrevious }}
+		  <a href="?{{ if .search }}s={{ .search }}&{{ end }}page={{ .page.PreviousPage }}">Previous</a>
 		{{ end }}
 		<span class="current">
-			Page {{ .Paginator.CurrentPage }} of {{ .Paginator.MaxPage }}.
+			Page {{ .page.Paginator.Page }} of {{ .page.Paginator.PageCount }}.
 		</span>
-		{{ if .HasNext }}
-		  <a href="?page={{ .NextPage }}">Next</a>
+		{{ if .page.HasNext }}
+		  <a href="?{{ if .search }}s={{ .search }}&{{ end }}page={{ .page.NextPage }}">Next</a>
 		{{ end }}
 	</span>
 </div>

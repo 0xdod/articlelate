@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+
 	"github.com/Kamva/mgm/v3"
 	"github.com/fibreactive/articlelate/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -10,9 +12,8 @@ import (
 type PostService interface {
 	Get(filter interface{}) *models.Post
 	GetByID(id interface{}) *models.Post
-	GetByTitle(string) *models.Post
-	GetAll() []*models.Post
-	Filter(filter interface{}) []*models.Post
+	All(interface{}) error
+	Filter(interface{}, interface{}) error
 	Create(*models.Post) error
 	Update(*models.Post) error
 	Delete(id interface{}) error
@@ -20,32 +21,48 @@ type PostService interface {
 
 //TODO
 //Q: Do i really need to pass the data store around since i'm using mgm?
-type PostStore struct{}
+type PostMongo struct{}
 
-func NewPostStore() *PostStore {
-	return &PostStore{}
+type MongoAdapter struct {
+	filter interface{}
 }
 
-func (ps *PostStore) Filter(filter interface{}) []*models.Post {
-	var posts []*models.Post
-	findOptions := options.Find().SetSort(bson.M{"created_at": -1})
-	err := mgm.CollectionByName("posts").SimpleFind(&posts, filter, findOptions)
+func NewPostMongo() *PostMongo {
+	return &PostMongo{}
+}
+
+func NewMongoAdapter() *MongoAdapter {
+	return &MongoAdapter{bson.M{}}
+}
+
+func (ma *MongoAdapter) Slice(offset, limit int, data interface{}) error {
+	findOptions := options.Find().SetSkip(int64(offset)).SetLimit(int64(limit)).
+		SetSort(bson.M{"created_at": -1})
+	return mgm.Coll(&models.Post{}).SimpleFind(data, ma.filter, findOptions)
+}
+
+func (ma *MongoAdapter) SetFilter(filter interface{}) {
+	ma.filter = filter
+}
+
+func (ma *MongoAdapter) Counts() int64 {
+	nums, err := mgm.Coll(&models.Post{}).CountDocuments(context.Background(), ma.filter)
 	if err != nil {
-		return nil
+		return 0
 	}
-	return posts
+	return nums
 }
 
-func (ps *PostStore) GetAll() []*models.Post {
-	var posts []*models.Post
+func (pm *PostMongo) Filter(posts, filter interface{}) error {
 	findOptions := options.Find().SetSort(bson.M{"created_at": -1})
-	if err := mgm.CollectionByName("posts").SimpleFind(&posts, bson.M{}, findOptions); err != nil {
-		return nil
-	}
-	return posts
+	return mgm.Coll(&models.Post{}).SimpleFind(posts, filter, findOptions)
 }
 
-func (*PostStore) query(filter interface{}) *models.Post {
+func (pm *PostMongo) All(posts interface{}) error {
+	return pm.Filter(posts, bson.M{})
+}
+
+func (*PostMongo) query(filter interface{}) *models.Post {
 	var post models.Post
 	if err := mgm.Coll(&post).First(filter, &post); err != nil {
 		return nil
@@ -53,30 +70,28 @@ func (*PostStore) query(filter interface{}) *models.Post {
 	return &post
 }
 
-func (a *PostStore) Get(filter interface{}) *models.Post {
-	return a.query(filter)
+func (pm *PostMongo) Get(filter interface{}) *models.Post {
+	return pm.query(filter)
 }
 
-func (ps *PostStore) Create(a *models.Post) error {
+func (pm *PostMongo) GetByID(id interface{}) *models.Post {
+	post := &models.Post{}
+	err := mgm.Coll(post).FindByID(id, post)
+	if err != nil {
+		return nil
+	}
+	return post
+}
+
+func (pm *PostMongo) Create(a *models.Post) error {
 	return mgm.Coll(a).Create(a)
 }
 
-func (ps *PostStore) GetByID(id interface{}) *models.Post {
-	var post models.Post
-	if err := mgm.Coll(&post).FindByID(id, &post); err != nil {
-		return nil
-	}
-	return &post
-}
-func (ps *PostStore) GetByTitle(t string) *models.Post {
-	return ps.query(bson.M{"title": t})
-}
-
-func (ps *PostStore) Update(a *models.Post) error {
+func (pm *PostMongo) Update(a *models.Post) error {
 	return mgm.Coll(a).Update(a)
 }
 
-func (ps *PostStore) Delete(id interface{}) error {
-	a := ps.GetByID(id)
+func (pm *PostMongo) Delete(id interface{}) error {
+	a := pm.GetByID(id)
 	return mgm.Coll(a).Delete(a)
 }

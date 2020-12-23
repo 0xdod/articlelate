@@ -1,21 +1,42 @@
-{{ define "title"}}Posts{{ end }} {{define "content" }} {{ if not .page }}
+{{ define "title"}}Posts{{ end }}
+
+{{define "content" }}
+{{ if not .page }}
 <div>
   <h1>No posts yet</h1>
 </div>
-{{ else }} {{ if .search }}
-<h2>Showing search results containing "{{ .search }}"</h2>
-{{ end }} {{range .page.Items}}
+{{ else }}
+{{ $search := "" }}
+{{ if .search }}
+{{ $search = .search }}
+{{ if .page.Items }}
+<h2>Showing search results matching "{{ .search }}"</h2>
+{{else}}
+<h2>No results matching "{{ .search }}"</h2>
+{{ end }}
+{{ end }}
+{{range .page.Items}}
 <div class="card mb-2">
   <div class="card-body">
     <a class="text-decoration-none" href="{{ .GetAbsoluteURL }}">
-      <h5>{{.Title}}</h5>
+      <h5>
+         {{if and $search (icontains .Title $search) }}{{ mark .Title $search }}{{ else }}{{ .Title }}{{ end }}
+      </h5>
     </a>
     <p class="card-text">
-      {{$limit := 280}} {{if not (ge $limit (len .Content))}} {{truncate $limit .Content}}
+      {{$limit := 280}}
+      {{if (gt (len .Content) $limit)}} 
+        {{ $content := (truncate $limit .Content) }}
+        {{if and $search (icontains $content $search) }}{{ mark $content $search }}{{ else }}{{ $content }}{{ end }}
       <a href="{{ .GetAbsoluteURL }}" class="text-info"><strong>Read more</strong></a>
-      {{else}} {{.Content}}
+      {{else}}
+        {{if and $search (icontains .Content $search) }}{{ mark .Content $search }}{{ else }}{{ .Content }}{{ end }}
     </p>
     {{end}}
   </div>
 </div>
-{{end}} {{ with .page }} {{template "pagination" .}} {{ end }} {{ end }} {{ end }}
+{{end}}
+
+{{template "pagination" .}}
+{{ end }}
+{{ end }}

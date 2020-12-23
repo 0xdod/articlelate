@@ -41,6 +41,8 @@ github.com/golang/snappy
 github.com/gosimple/slug
 # github.com/jinzhu/inflection v1.0.0
 github.com/jinzhu/inflection
+# github.com/joncalhoun/form v1.0.0
+## explicit
 # github.com/json-iterator/go v1.1.9
 github.com/json-iterator/go
 # github.com/klauspost/compress v1.9.5
@@ -68,6 +70,8 @@ github.com/stretchr/testify/assert
 github.com/stretchr/testify/require
 # github.com/ugorji/go/codec v1.1.7
 github.com/ugorji/go/codec
+# github.com/vcraescu/go-paginator v1.0.0
+## explicit
 # github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c
 github.com/xdg/scram
 # github.com/xdg/stringprep v1.0.0

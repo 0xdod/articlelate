@@ -1,17 +1,19 @@
 package main
 
 // Write tests
+// in production,
+// use a cdn for fonts, bootstrap and icons.
 
 import (
 	"log"
 	"os"
 
+	mgm "github.com/Kamva/mgm/v3"
 	"github.com/fibreactive/articlelate/templates"
 
 	"github.com/fibreactive/articlelate/handler"
 	"github.com/gin-gonic/gin"
 
-	"github.com/Kamva/mgm/v3"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -33,6 +35,6 @@ func main() {
 	r.HTMLRender = templates.LoadTemplates("./templates")
 	h := handler.NewHandler()
 	Routes(r, h)
-	//gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.ReleaseMode)
 	r.Run()
 }

@@ -3,80 +3,92 @@ package handler
 import (
 	"errors"
 	"math"
-
-	"github.com/fibreactive/articlelate/models"
 )
 
-const minPage int = 1
+const (
+	DefaultLimit  = 10
+	MinPageNumber = 1
+)
 
 var (
-	PageNotAnInteger = errors.New("Pagination: Page not an integer")
-	EmptyPage        = errors.New("Pagination: Page doesn't exist")
+	EmptyPage = errors.New("Pagination: Page doesn't exist")
 )
 
+type Adapter interface {
+	Slice(offset, limit int, data interface{}) error
+	Counts() int64
+}
+
 type Page struct {
-	Items []*models.Post
 	*Paginator
+	Items interface{}
 }
 
 type Paginator struct {
-	ObjectList   []*models.Post
-	CurrentPage  int
-	NextPage     int
-	PreviousPage int
-	Limit        int
-	MaxPage      int
+	adapter Adapter
+	limit   int
+	page    int
 }
 
-func NewPaginator(objectList []*models.Post, limit int) *Paginator {
-	if objectList == nil {
-		return nil
+func NewPaginator(a Adapter, limit int) *Paginator {
+	if limit < 1 {
+		limit = DefaultLimit
 	}
-	var maxPage = int(math.Ceil(float64(len(objectList)) / float64(limit)))
 	return &Paginator{
-		MaxPage:     maxPage,
-		ObjectList:  objectList,
-		Limit:       limit,
-		CurrentPage: minPage,
+		adapter: a,
+		limit:   limit,
 	}
 }
 
-func (pg *Paginator) Page(page int) (*Page, error) {
-	if page < minPage || page > pg.MaxPage {
-		return nil, EmptyPage
+func (p *Paginator) Result(data interface{}) error {
+	if p.page < MinPageNumber || p.page > p.PageCount() {
+		return EmptyPage
 	}
-	lowerLimit := (page - 1) * pg.Limit
-	upperLimit := lowerLimit + pg.Limit
-	if len(pg.ObjectList) < upperLimit {
-		upperLimit = len(pg.ObjectList)
+	skip := (p.page - 1) * p.limit
+	return p.adapter.Slice(skip, p.limit, data)
+}
+
+func (p *Paginator) Page() int {
+	return p.page
+}
+
+func (p *Paginator) SetPage(page int) {
+	p.page = page
+}
+
+func (p *Paginator) PreviousPage() int {
+	prevPage := p.page - 1
+	if prevPage < MinPageNumber {
+		return MinPageNumber
 	}
-	pg.CurrentPage = page
-	pg.NextPage = page + 1
-	pg.PreviousPage = page - 1
-	items := pg.ObjectList[lowerLimit:upperLimit]
-	return &Page{items, pg}, nil
+	return prevPage
 }
 
-func (p *Page) CurrentPage() int {
-	return p.Paginator.CurrentPage
+func (p *Paginator) NextPage() int {
+	nextPage := p.page + 1
+	maxPage := p.PageCount()
+	if nextPage > maxPage {
+		return maxPage
+	}
+	return nextPage
 }
 
-func (p *Page) PreviousPage() int {
-	return p.Paginator.PreviousPage
-}
-
-func (p *Page) NextPage() int {
-	return p.Paginator.NextPage
-}
-
-func (p *Page) HasPrevious() bool {
+func (p *Paginator) HasPrevious() bool {
 	prev := p.PreviousPage()
-	curr := p.CurrentPage()
-	return prev >= minPage && prev < curr
+	curr := p.Page()
+	return prev >= MinPageNumber && prev < curr
 }
 
-func (p *Page) HasNext() bool {
+func (p *Paginator) HasNext() bool {
 	next := p.NextPage()
-	curr := p.CurrentPage()
-	return next <= p.Paginator.MaxPage && next > curr
+	curr := p.Page()
+	return next <= p.PageCount() && next > curr
+}
+
+func (p *Paginator) PageCount() int {
+	n := int(math.Ceil(float64(p.adapter.Counts()) / float64(p.limit)))
+	if n < 1 {
+		return 1
+	}
+	return n
 }

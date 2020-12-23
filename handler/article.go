@@ -6,37 +6,32 @@ import (
 	"strconv"
 
 	"github.com/fibreactive/articlelate/models"
+	"github.com/fibreactive/articlelate/service"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 func (h *Handler) PostList(c *gin.Context) {
 	var posts []*models.Post
-	// if s in query string
-	// find in db posts with string s
 	search := c.Query("s")
+	adapter := service.NewMongoAdapter()
 	if search != "" {
-		filter := bson.M{"$text": bson.M{"$search": search}}
-		posts = h.ps.Filter(filter)
-	} else {
-		posts = h.ps.GetAll()
+		adapter.SetFilter(bson.M{"$text": bson.M{"$search": search}})
 	}
-	var page *Page
-	paginator := NewPaginator(posts, 5)
-	if paginator == nil {
-		page = nil
-	} else {
-
-		pageNo, err := strconv.Atoi(c.DefaultQuery("page", "1"))
-		if err != nil {
-			pageNo = minPage
-		}
-		page, err = paginator.Page(pageNo)
-		if err == EmptyPage {
-			page, _ = paginator.Page(paginator.MaxPage)
-		}
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil {
+		page = MinPageNumber
 	}
-	render(c, http.StatusOK, "post_list.html", gin.H{"page": page, "search": search})
+	paginator := NewPaginator(adapter, 10)
+	paginator.SetPage(page)
+	if err := paginator.Result(&posts); err == EmptyPage {
+		paginator.SetPage(paginator.PageCount())
+		paginator.Result(&posts)
+	}
+	render(c, http.StatusOK, "post_list.html", gin.H{
+		"page":   Page{paginator, posts},
+		"search": search,
+	})
 }
 
 func (h *Handler) PostDetail(c *gin.Context) {

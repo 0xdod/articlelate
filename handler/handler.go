@@ -17,7 +17,7 @@ type Handler struct {
 
 func NewHandler() *Handler {
 	us := service.NewUserStore()
-	ps := service.NewPostStore()
+	ps := service.NewPostMongo()
 	cs := service.NewCommentStore()
 	dh = &Handler{
 		us: us,

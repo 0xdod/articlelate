@@ -1,9 +1,12 @@
 package templates
 
 import (
+	"fmt"
 	"html"
 	"html/template"
+	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/gin-contrib/multitemplate"
@@ -11,10 +14,14 @@ import (
 
 func GetFuncMap() template.FuncMap {
 	return template.FuncMap{
-		"truncate":   Truncate,
-		"pluralize":  Pluralize,
-		"decr":       Decrement,
-		"linebreaks": LineBreaks,
+		"truncate":     Truncate,
+		"pluralize":    Pluralize,
+		"decr":         Decrement,
+		"linebreaks":   LineBreaks,
+		"mark":         mark,
+		"contains":     strings.Contains,
+		"icontains":    icontains,
+		"isProduction": isProduction,
 	}
 }
 
@@ -77,12 +84,33 @@ func Decrement(value int) int {
 
 func LineBreaks(content string) template.HTML {
 	content = html.EscapeString(content)
-	content = strings.Replace(content, "\r", "", -1)
-	content = strings.Replace(content, "\n", "<br>", -1)
+	content = strings.ReplaceAll(content, "\r", "")
+	content = strings.ReplaceAll(content, "\n", "<br>")
 	cs := strings.Split(content, "<br><br>")
 	newContent := ""
 	for _, c := range cs {
 		newContent += "<p>" + c + "</p>"
 	}
 	return template.HTML(newContent)
+}
+
+func mark(content, search string) template.HTML {
+	content = html.EscapeString(content)
+	if search != "" {
+		exp := fmt.Sprintf(`(?mi)(?P<key>%s)`, search)
+		re := regexp.MustCompile(exp)
+		temp := "<mark>$key</mark>"
+		content = re.ReplaceAllString(content, temp)
+	}
+	return template.HTML(content)
+}
+
+func icontains(str, substr string) bool {
+	str = strings.ToLower(str)
+	substr = strings.ToLower(substr)
+	return strings.Contains(str, substr)
+}
+
+func isProduction() bool {
+	return os.Getenv("GIN_MODE") == "release"
 }

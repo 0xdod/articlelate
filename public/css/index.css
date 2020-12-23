@@ -27,3 +27,7 @@ body{
 .comments:not(:last-child) {
 	border-bottom: 1px solid #eee;
 }
+
+mark {
+	background-color: yellow;
+}

@@ -9,6 +9,8 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.2.0 // indirect
 	github.com/gosimple/slug v1.9.0
+	github.com/joncalhoun/form v1.0.0 // indirect
+	github.com/vcraescu/go-paginator v1.0.0 // indirect
 	go.mongodb.org/mongo-driver v1.3.4
 	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899
 )
