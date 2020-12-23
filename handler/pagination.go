@@ -15,12 +15,12 @@ var (
 )
 
 type Page struct {
-	Items []*models.Article
+	Items []*models.Post
 	*Paginator
 }
 
 type Paginator struct {
-	ObjectList   []*models.Article
+	ObjectList   []*models.Post
 	CurrentPage  int
 	NextPage     int
 	PreviousPage int
@@ -28,7 +28,7 @@ type Paginator struct {
 	MaxPage      int
 }
 
-func NewPaginator(objectList []*models.Article, limit int) *Paginator {
+func NewPaginator(objectList []*models.Post, limit int) *Paginator {
 	if objectList == nil {
 		return nil
 	}

@@ -2,9 +2,9 @@ package handler
 
 type Action int8
 
+// imporove data validation
 const (
-	_ Action = iota
-	Like
+	Like Action = iota + 1
 	Unlike
 )
 
@@ -27,8 +27,8 @@ func ParseAction(s string) Action {
 }
 
 type LikeRequest struct {
-	ArticleID string `form:"article_id" json:"articleID" binding:"required"`
-	Action    string `form:"action" json:"action" binding:"required"`
+	PostID string `form:"post_id" json:"postID" binding:"required"`
+	Action string `form:"action" json:"action" binding:"required"`
 }
 
 type LoginForm struct {
@@ -43,11 +43,11 @@ type SignUpForm struct {
 }
 
 type CommentForm struct {
-	ArticleID string `form:"article_id" json:"articleID" binding:"required,min=1"`
-	Content   string `form:"content" json:"content"  binding:"required,min=1"`
+	PostID  string `form:"post_id" json:"postID" binding:"required,min=1"`
+	Content string `form:"content" json:"content"  binding:"required,min=1"`
 }
 
-type ArticleForm struct {
+type PostForm struct {
 	Title   string `form:"title" json:"title" binding:"required,min=1"`
 	Content string `form:"content" json:"content"  binding:"required,min=1"`
 }

@@ -10,10 +10,19 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func (h *Handler) ArticleList(c *gin.Context) {
-	articles := h.as.GetAll()
+func (h *Handler) PostList(c *gin.Context) {
+	var posts []*models.Post
+	// if s in query string
+	// find in db posts with string s
+	search := c.Query("s")
+	if search != "" {
+		filter := bson.M{"$text": bson.M{"$search": search}}
+		posts = h.ps.Filter(filter)
+	} else {
+		posts = h.ps.GetAll()
+	}
 	var page *Page
-	paginator := NewPaginator(articles, 5)
+	paginator := NewPaginator(posts, 5)
 	if paginator == nil {
 		page = nil
 	} else {
@@ -27,117 +36,117 @@ func (h *Handler) ArticleList(c *gin.Context) {
 			page, _ = paginator.Page(paginator.MaxPage)
 		}
 	}
-	render(c, http.StatusOK, "post_list.html", gin.H{"page": page})
+	render(c, http.StatusOK, "post_list.html", gin.H{"page": page, "search": search})
 }
 
-func (h *Handler) ArticleDetail(c *gin.Context) {
+func (h *Handler) PostDetail(c *gin.Context) {
 	slug := c.Param("slug")
 	u := c.Param("u")
 	filter := bson.M{"author.username": u, "slug": slug}
-	article := h.as.Get(filter)
+	post := h.ps.Get(filter)
 	status := http.StatusOK
 	templateName := "post_detail.html"
-	if article == nil {
+	if post == nil {
 		status = http.StatusNotFound
 		templateName = "404.html"
 	} else {
-		article.Comments = h.cs.GetByArticle(article)
+		post.Comments = h.cs.GetByPost(post)
 	}
-	render(c, status, templateName, gin.H{"post": article})
+	render(c, status, templateName, gin.H{"post": post})
 }
 
-func (h *Handler) CreateArticle(c *gin.Context) {
+func (h *Handler) CreatePost(c *gin.Context) {
 	user := getUserFromContext(c)
 	if c.Request.Method == "POST" {
-		var req ArticleForm
+		var req PostForm
 		if err := Bind(c, &req); err != nil {
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
-		article := models.NewArticle(user, req.Title, req.Content)
-		if err := h.as.Create(article); err != nil {
+		post := models.NewPost(user, req.Title, req.Content)
+		if err := h.ps.Create(post); err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 		//@TODO comeback
-		c.Redirect(http.StatusSeeOther, article.GetAbsoluteURL())
+		c.Redirect(http.StatusSeeOther, post.GetAbsoluteURL())
 		return
 	}
 	render(c, http.StatusOK, "create_post.html", gin.H{})
 }
 
-func (h *Handler) DeleteArticle(c *gin.Context) {
+func (h *Handler) DeletePost(c *gin.Context) {
 	slug := c.Param("slug")
 	u := c.Param("u")
 	filter := bson.M{"author.username": u, "slug": slug}
-	article := h.as.Get(filter)
+	post := h.ps.Get(filter)
 	user := getUserFromContext(c)
-	if user == nil || user.ID != article.Author.ID {
+	if user == nil || user.ID != post.Author.ID {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-	err := h.as.Delete(article.ID)
+	err := h.ps.Delete(post.ID)
 	if err != nil {
-		render(c, http.StatusNotFound, "404.html", gin.H{"post": article})
+		render(c, http.StatusNotFound, "404.html", gin.H{"post": post})
 		return
 	}
 	c.Redirect(303, "/")
 }
 
-func (h *Handler) UpdateArticle(c *gin.Context) {
+func (h *Handler) UpdatePost(c *gin.Context) {
 	var Err error
 	slug := c.Param("slug")
 	u := c.Param("u")
 	filter := bson.M{"author.username": u, "slug": slug}
-	article := h.as.Get(filter)
+	post := h.ps.Get(filter)
 	user := getUserFromContext(c)
-	if user == nil || user.ID != article.Author.ID {
+	if user == nil || user.ID != post.Author.ID {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 	if c.Request.Method == "POST" {
-		var req ArticleForm
+		var req PostForm
 		if err := Bind(c, &req); err != nil {
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
-		article.Title = req.Title
-		article.Content = req.Content
-		err := h.as.Update(article)
+		post.Title = req.Title
+		post.Content = req.Content
+		err := h.ps.Update(post)
 		if err == nil {
-			c.Redirect(303, article.GetAbsoluteURL())
+			c.Redirect(303, post.GetAbsoluteURL())
 			return
 		}
 		Err = errors.New("Internal server error")
 	}
 	render(c, http.StatusOK, "edit_post.html", gin.H{
-		"post":  article,
+		"post":  post,
 		"error": Err,
 	})
 }
 
-func (h *Handler) LikeArticle(c *gin.Context) {
+func (h *Handler) LikePost(c *gin.Context) {
 	var req LikeRequest
 	if err := c.BindJSON(&req); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-	articleID := req.ArticleID
-	article := h.as.GetByID(articleID)
+	postID := req.PostID
+	post := h.ps.GetByID(postID)
 	user := getUserFromContext(c)
-	if user == nil || article == nil {
+	if user == nil || post == nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 	switch ParseAction(req.Action) {
 	case Like:
-		user.Like(article)
+		user.Like(post)
 	case Unlike:
-		user.Unlike(article)
+		user.Unlike(post)
 	default:
 		c.JSON(http.StatusForbidden, gin.H{"error": "Error processing request"})
 		return
 	}
-	h.as.Update(article)
-	c.JSON(http.StatusOK, gin.H{"likes": len(article.Likes)})
+	h.ps.Update(post)
+	c.JSON(http.StatusOK, gin.H{"likes": len(post.Likes)})
 }

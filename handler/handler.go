@@ -11,17 +11,17 @@ var dh *Handler
 
 type Handler struct {
 	us service.UserService
-	as service.ArticleService
+	ps service.PostService
 	cs service.CommentService
 }
 
 func NewHandler() *Handler {
 	us := service.NewUserStore()
-	as := service.NewArticleStore()
+	ps := service.NewPostStore()
 	cs := service.NewCommentStore()
 	dh = &Handler{
 		us: us,
-		as: as,
+		ps: ps,
 		cs: cs,
 	}
 	return dh
