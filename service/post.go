@@ -2,10 +2,13 @@ package service
 
 import (
 	"context"
+	"log"
+	"time"
 
 	"github.com/Kamva/mgm/v3"
 	"github.com/fibreactive/articlelate/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -19,6 +22,30 @@ type PostService interface {
 	Delete(id interface{}) error
 }
 
+func PopulateIndex() {
+	CreateSlugIndex()
+	CreateTextIndex()
+	log.Println("Successfully create the indexes")
+}
+
+func CreateTextIndex() {
+	coll := mgm.Coll(&models.Post{}).Collection
+	opts := options.CreateIndexes().SetMaxTime(10 * time.Second)
+	index := mongo.IndexModel{}
+	index.Keys = bson.D{{"title", "text"}, {"content", "text"}}
+	index.Options = options.Index().SetBackground(true)
+	coll.Indexes().CreateOne(context.Background(), index, opts)
+}
+
+func CreateSlugIndex() {
+	coll := mgm.Coll(&models.Post{}).Collection
+	opts := options.CreateIndexes().SetMaxTime(10 * time.Second)
+	index := mongo.IndexModel{}
+	index.Keys = bson.D{{"slug", 1}, {"author.username", 1}}
+	index.Options = options.Index().SetBackground(true).SetUnique(true)
+	coll.Indexes().CreateOne(context.Background(), index, opts)
+}
+
 //TODO
 //Q: Do i really need to pass the data store around since i'm using mgm?
 type PostMongo struct{}
@@ -28,6 +55,7 @@ type MongoAdapter struct {
 }
 
 func NewPostMongo() *PostMongo {
+	PopulateIndex()
 	return &PostMongo{}
 }
 
