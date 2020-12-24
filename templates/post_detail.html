@@ -101,7 +101,7 @@
 {{if .user}}
 <section class="col-md-4 mb-3" id="write-comment">
   <h5>Post your comment</h5>
-  <form method="POST" action="/{{ .post.GetAbsoluteURL }}/comment">
+  <form method="POST" action="{{ .post.GetAbsoluteURL }}/comment">
     <input type="hidden" name="post_id" value="{{.post.ID.Hex}}" />
     <div class="form-group">
       <textarea class="form-control" name="content" id="comment-body" required></textarea>
