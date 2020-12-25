@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/fibreactive/articlelate/models"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 )
@@ -40,9 +41,12 @@ func getUserFromContext(c *gin.Context) *models.User {
 }
 
 func addUserToTemplateContext(c *gin.Context) *models.User {
-	token, err := c.Cookie("auth")
-	if err != nil {
+	session := sessions.Default(c)
+	var auth string
+	a := session.Get("auth")
+	auth, ok := a.(string)
+	if !ok {
 		return nil
 	}
-	return dh.us.FindByToken(token)
+	return dh.us.FindByToken(auth)
 }

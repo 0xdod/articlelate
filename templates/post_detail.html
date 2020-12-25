@@ -35,6 +35,7 @@
           <a href="{{ .post.GetAbsoluteURL }}/edit" class="text-dark">
             <i class="fas fa-edit"></i>
           </a>
+          <span class="text-info">{{ if .post.Modified }}(edited){{ end }}</span>
         </div>
 
       <div class="ml-auto">

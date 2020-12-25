@@ -4,10 +4,18 @@ import (
 	"net/http"
 
 	"github.com/fibreactive/articlelate/service"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
 var dh *Handler
+
+// move secret to env variable
+var cookieStore = cookie.NewStore([]byte("hello"))
+
+//var c = mgm.CollectionByName("sessions").Collection
+
+//var _ = mongo.NewStore(c, 3600, true, []byte("secret"))
 
 type Handler struct {
 	us service.UserService

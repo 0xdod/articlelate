@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/fibreactive/articlelate/models"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -42,9 +43,15 @@ func (h *Handler) Login(c *gin.Context) {
 		if user == nil {
 			Err = errors.New("Login details incorrect try again")
 		} else {
+			session := sessions.Default(c)
 			token, err := h.us.GenerateAuthToken(user)
 			if err == nil {
-				c.SetCookie("auth", token, 360000, "/", "", false, true)
+				session.Set("auth", token)
+				err := session.Save()
+				if err != nil {
+					c.AbortWithStatus(http.StatusInternalServerError)
+					return
+				}
 				c.Redirect(http.StatusSeeOther, "/")
 				return
 			}
@@ -52,6 +59,8 @@ func (h *Handler) Login(c *gin.Context) {
 	}
 	user := getUserFromContext(c)
 	if user != nil {
+		// display flash message that user is logged in
+		// asking them to go to home or to logout
 		c.Redirect(http.StatusSeeOther, "/")
 		return
 	}
@@ -59,16 +68,13 @@ func (h *Handler) Login(c *gin.Context) {
 }
 
 func (h *Handler) Logout(c *gin.Context) {
-	token, err := c.Cookie("auth")
+	session := sessions.Default(c)
+	session.Clear()
+	err := session.Save()
 	if err != nil {
-		c.AbortWithStatus(http.StatusForbidden)
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-	if err := h.us.RemoveAuthToken(token); err != nil {
-		c.AbortWithStatus(http.StatusForbidden)
-		return
-	}
-	c.SetCookie("auth", "", -1, "/", "", false, true)
 	c.Redirect(http.StatusSeeOther, "/")
 }
 

@@ -3,7 +3,7 @@ package models
 import (
 	"fmt"
 
-	"github.com/Kamva/mgm/v3"
+	mgm "github.com/Kamva/mgm/v3"
 	"github.com/gosimple/slug"
 )
 
@@ -15,6 +15,7 @@ type Post struct {
 	Comments         []*Comment `bson:"-"`
 	Author           *User      `bson:"author"`
 	Slug             string     `bson:"slug"`
+	Modified         bool       `bson:"modified"`
 }
 
 func NewPost(author *User, title, body string) *Post {

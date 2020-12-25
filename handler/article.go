@@ -34,6 +34,7 @@ func (h *Handler) PostList(c *gin.Context) {
 	})
 }
 
+// TODO,show views
 func (h *Handler) PostDetail(c *gin.Context) {
 	slug := c.Param("slug")
 	u := c.Param("u")
@@ -105,6 +106,7 @@ func (h *Handler) UpdatePost(c *gin.Context) {
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
+		post.Modified = (post.Title != req.Title) || (post.Content != req.Content)
 		post.Title = req.Title
 		post.Content = req.Content
 		err := h.ps.Update(post)

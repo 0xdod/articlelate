@@ -1,11 +1,12 @@
 package service
 
 import (
-	"github.com/Kamva/mgm/v3"
+	mgm "github.com/Kamva/mgm/v3"
 	"github.com/fibreactive/articlelate/models"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+// allow quote and mentions
 type CommentService interface {
 	GetByPost(*models.Post) []*models.Comment
 	GetByID(id interface{}) *models.Comment

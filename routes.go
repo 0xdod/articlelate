@@ -8,6 +8,7 @@ import (
 
 func Routes(router *gin.Engine, handler *handler.Handler) {
 	//PRIVATE ROUTES
+	router.Use(handler.Sessions("session.id"))
 	private := router.Group("")
 	private.Use(handler.Authorize())
 	postPrivate := private.Group("/p")

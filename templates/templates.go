@@ -12,12 +12,15 @@ import (
 	"github.com/gin-contrib/multitemplate"
 )
 
+// create a function that when viewing search results,
+// it shows the part that match in yellow too in the list page
+// even if it is far above the limit
 func GetFuncMap() template.FuncMap {
 	return template.FuncMap{
-		"truncate":     Truncate,
-		"pluralize":    Pluralize,
-		"decr":         Decrement,
-		"linebreaks":   LineBreaks,
+		"truncate":     truncate,
+		"pluralize":    pluralize,
+		"decr":         decrement,
+		"linebreaks":   lineBreaks,
 		"mark":         mark,
 		"contains":     strings.Contains,
 		"icontains":    icontains,
@@ -54,35 +57,25 @@ func LoadTemplates(templatesDir string) multitemplate.Renderer {
 	return r
 }
 
-func Truncate(limit int, content string) string {
+func truncate(limit int, content string) string {
 	if len(content) <= limit {
 		return content
 	}
-	oldContentSlice := strings.Fields(content)
-	var newContentSlice []string
-	var newContent string
-	for _, v := range oldContentSlice {
-		if len(newContent) >= limit {
-			break
-		}
-		newContent += v + " "
-		newContentSlice = append(newContentSlice, v)
-	}
-	return strings.Join(newContentSlice, " ") + "..."
+	return content[:limit] + "..."
 }
 
-func Pluralize(count int) string {
+func pluralize(count int) string {
 	if count == 1 {
 		return ""
 	}
 	return "s"
 }
 
-func Decrement(value int) int {
+func decrement(value int) int {
 	return value - 1
 }
 
-func LineBreaks(content string) template.HTML {
+func lineBreaks(content string) template.HTML {
 	content = html.EscapeString(content)
 	content = strings.ReplaceAll(content, "\r", "")
 	content = strings.ReplaceAll(content, "\n", "<br>")

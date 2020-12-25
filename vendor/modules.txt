@@ -13,6 +13,10 @@ github.com/dgrijalva/jwt-go
 # github.com/gin-contrib/multitemplate v0.0.0-20200916052041-666a7309d230
 ## explicit
 github.com/gin-contrib/multitemplate
+# github.com/gin-contrib/sessions v0.0.3
+## explicit
+github.com/gin-contrib/sessions
+github.com/gin-contrib/sessions/cookie
 # github.com/gin-contrib/sse v0.1.0
 github.com/gin-contrib/sse
 # github.com/gin-gonic/gin v1.6.3
@@ -36,6 +40,12 @@ github.com/go-stack/stack
 github.com/golang/protobuf/proto
 # github.com/golang/snappy v0.0.1
 github.com/golang/snappy
+# github.com/gorilla/context v1.1.1
+github.com/gorilla/context
+# github.com/gorilla/securecookie v1.1.1
+github.com/gorilla/securecookie
+# github.com/gorilla/sessions v1.1.3
+github.com/gorilla/sessions
 # github.com/gosimple/slug v1.9.0
 ## explicit
 github.com/gosimple/slug
@@ -55,9 +65,9 @@ github.com/klauspost/compress/zstd/internal/xxhash
 github.com/leodido/go-urn
 # github.com/mattn/go-isatty v0.0.12
 github.com/mattn/go-isatty
-# github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421
+# github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
 github.com/modern-go/concurrent
-# github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742
+# github.com/modern-go/reflect2 v1.0.1
 github.com/modern-go/reflect2
 # github.com/pkg/errors v0.8.1
 github.com/pkg/errors
@@ -65,11 +75,14 @@ github.com/pkg/errors
 github.com/pmezard/go-difflib/difflib
 # github.com/rainycape/unidecode v0.0.0-20150907023854-cb7f23ec59be
 github.com/rainycape/unidecode
-# github.com/stretchr/testify v1.4.0
+# github.com/stretchr/testify v1.6.1
+## explicit
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/require
 # github.com/ugorji/go/codec v1.1.7
 github.com/ugorji/go/codec
+# github.com/utrack/gin-csrf v0.0.0-20190424104817-40fb8d2c8fca
+## explicit
 # github.com/vcraescu/go-paginator v1.0.0
 ## explicit
 # github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c
@@ -123,3 +136,5 @@ golang.org/x/text/transform
 golang.org/x/text/unicode/norm
 # gopkg.in/yaml.v2 v2.2.8
 gopkg.in/yaml.v2
+# gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
+gopkg.in/yaml.v3

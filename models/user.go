@@ -7,18 +7,20 @@ import (
 // revise user authentication flow
 type User struct {
 	mgm.DefaultModel `bson:",inline"`
-	Username         string   `bson:"username"`
-	Email            string   `bson:"email"`
-	Followers        int      `bson:"followers"`
-	Following        int      `bson:"following"`
-	Password         string   `bson:"-"`
-	PasswordHash     string   `bson:"passwordHash"`
-	Tokens           []*Token `bson:"tokens"`
+	Username         string `bson:"username"`
+	Email            string `bson:"email"`
+	Followers        int    `bson:"followers"`
+	Following        int    `bson:"following"`
+	Password         string `bson:"-"`
+	PasswordHash     string `bson:"passwordHash"`
+	AvatarURL        string `bson:"avatarURL"`
+	IsActive         bool   `bson:"isActive"`
 }
 
-type Token struct {
-	Access string `bson:"access" binding:required`
-	Token  string `bson:"token" binding:required`
+type Developer struct {
+	mgm.DefaultModel `bson:",inline"`
+	ApiKey           string `bson:"apiKey"`
+	*User            `bson:"user"`
 }
 
 func NewUser(name, email, pswd string) *User {

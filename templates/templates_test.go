@@ -22,3 +22,17 @@ func Testmark(t *testing.T) {
 		t.Errorf("Expected %s, but got %s", string(html), newContent)
 	}
 }
+
+func TestTruncate(t *testing.T) {
+	content := "I want to repeat this at least one hundred times"
+	limit := 5
+	content = Truncate(limit, content)
+	newContent := "I wan..."
+	if content != newContent {
+		t.Errorf("Expected %s, but got %s", content, newContent)
+	}
+	if len(content) > len(newContent) {
+		t.Errorf("Expected content length of at least %d, but got %d",
+			len(newContent), len(content))
+	}
+}

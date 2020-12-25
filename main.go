@@ -1,9 +1,10 @@
 package main
 
 // Write tests
-// in production,
-// use a cdn for fonts, bootstrap and icons.
-
+// add more features, ability to style text (bold, italics),
+// ability to add color
+// ability to embed url
+//emojis support, pictures and gifs and videos
 import (
 	"log"
 	"os"

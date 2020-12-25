@@ -28,12 +28,17 @@ func PopulateIndex() {
 	log.Println("Successfully create the indexes")
 }
 
+func PopulateFrontPage() {
+
+}
+
 func CreateTextIndex() {
 	coll := mgm.Coll(&models.Post{}).Collection
 	opts := options.CreateIndexes().SetMaxTime(10 * time.Second)
 	index := mongo.IndexModel{}
 	index.Keys = bson.D{{"title", "text"}, {"content", "text"}}
-	index.Options = options.Index().SetBackground(true)
+	index.Options = options.Index().SetBackground(true).
+		SetWeights(bson.M{"title": 10, "content": 5})
 	coll.Indexes().CreateOne(context.Background(), index, opts)
 }
 
